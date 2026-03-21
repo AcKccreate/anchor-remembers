@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>The Anchor Remembers — A Digital Memory Companion</title>
+<meta name="description" content="Capture the voice, stories, and wisdom of someone you love. A gentle memory archive by AnchorWithin.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A0E;--s:#111116;--s2:#18181E;--s3:#202028;
+  --b:rgba(255,255,255,.05);--bw:rgba(210,190,150,.15);
+  --warm:#D2BE96;--warm-b:#E8D4AE;--warm-d:#8A7A5A;--warm-g:rgba(210,190,150,.07);
+  --sage:#8AB5A0;--sage-g:rgba(138,181,160,.08);
+  --rose:#D4A0A8;--rose-g:rgba(212,160,168,.08);
+  --t:#E8E4DC;--t2:#A09C94;--t3:#5C5A54;
+  --fd:'Lora',Georgia,serif;--fb:'Karla',system-ui,sans-serif;
+  --r:16px;--rs:12px;--rx:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--bg);color:var(--t);min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 20%,rgba(210,190,150,.03),transparent);pointer-events:none;z-index:0}
+
+/* ── SCREENS ── */
+.screen{display:none;min-height:100vh;min-height:100dvh;position:relative;z-index:2}
+.screen.active{display:flex;flex-direction:column}
+
+/* ── PERMISSION SCREEN ── */
+.perm-screen{align-items:center;justify-content:center;text-align:center;padding:40px 24px}
+.perm-icon{font-size:2.5rem;margin-bottom:16px;opacity:0;animation:gentle 1s .2s ease both}
+.perm-title{font-family:var(--fd);font-size:clamp(1.6rem,5vw,2.2rem);font-weight:400;color:var(--t);margin-bottom:12px;opacity:0;animation:gentle 1s .4s ease both}
+.perm-title em{font-style:italic;color:var(--warm)}
+.perm-text{font-size:.9rem;color:var(--t2);max-width:380px;line-height:1.7;font-weight:300;margin-bottom:28px;opacity:0;animation:gentle 1s .6s ease both}
+.perm-promise{font-family:var(--fd);font-size:.85rem;font-style:italic;color:var(--sage);max-width:340px;line-height:1.6;margin-bottom:32px;padding:16px;border:1px solid rgba(138,181,160,.15);border-radius:var(--r);background:var(--sage-g);opacity:0;animation:gentle 1s .8s ease both}
+.perm-btns{display:flex;flex-direction:column;gap:10px;width:100%;max-width:300px;opacity:0;animation:gentle 1s 1s ease both}
+@keyframes gentle{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 28px;border:none;border-radius:var(--rs);
+  font-family:var(--fb);font-size:.88rem;font-weight:600;
+  cursor:pointer;transition:all .25s;text-decoration:none;
+}
+.btn-warm{background:var(--warm);color:var(--bg)}
+.btn-warm:hover{background:var(--warm-b);transform:translateY(-1px);box-shadow:0 8px 24px rgba(210,190,150,.2)}
+.btn-ghost{background:transparent;border:1px solid var(--warm-d);color:var(--warm)}
+.btn-ghost:hover{background:var(--warm-g)}
+.btn-wide{width:100%}
+
+/* ── SETUP SCREEN ── */
+.setup-screen{padding:0}
+.setup-header{padding:28px 20px;text-align:center;border-bottom:1px solid var(--b)}
+.setup-header h2{font-family:var(--fd);font-size:1.3rem;font-weight:500;color:var(--t)}
+.setup-header p{font-size:.78rem;color:var(--t3);margin-top:4px}
+.setup-body{flex:1;overflow-y:auto;padding:20px 16px}
+.setup-field{margin-bottom:16px}
+.setup-field label{display:block;font-family:var(--fd);font-size:.9rem;color:var(--t);margin-bottom:6px;font-weight:500}
+.setup-field .hint{font-size:.72rem;color:var(--t3);margin-bottom:6px;font-style:italic}
+input[type="text"],textarea{
+  width:100%;padding:13px 14px;background:var(--s2);border:1px solid var(--b);
+  border-radius:var(--rs);color:var(--t);font-family:var(--fb);font-size:.9rem;
+  outline:none;transition:border-color .2s;line-height:1.5;
+}
+textarea{resize:vertical;min-height:80px}
+input:focus,textarea:focus{border-color:var(--warm-d)}
+input::placeholder,textarea::placeholder{color:var(--t3)}
+.setup-footer{padding:16px;border-top:1px solid var(--b);flex-shrink:0}
+
+/* ── QUESTIONS SCREEN ── */
+.q-screen{padding:0}
+.q-progress{padding:12px 16px;background:var(--s);border-bottom:1px solid var(--b);flex-shrink:0}
+.q-bar{height:4px;background:var(--s3);border-radius:4px;overflow:hidden}
+.q-bar-fill{height:100%;background:var(--warm);border-radius:4px;transition:width .5s ease}
+.q-count{font-size:.68rem;color:var(--t3);margin-top:6px;text-align:center}
+.q-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center}
+.q-category{font-size:.62rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--warm-d);margin-bottom:12px}
+.q-text{font-family:var(--fd);font-size:clamp(1.1rem,4vw,1.5rem);font-weight:400;font-style:italic;color:var(--t);max-width:400px;line-height:1.5;margin-bottom:24px}
+.q-input{width:100%;max-width:420px}
+.q-input textarea{min-height:100px;font-family:var(--fd);font-size:.95rem}
+.q-footer{padding:16px;border-top:1px solid var(--b);display:flex;gap:10px;flex-shrink:0}
+.q-footer .btn{flex:1}
+.q-skip{font-size:.78rem;color:var(--t3);cursor:pointer;text-align:center;padding:8px;transition:color .2s}
+.q-skip:hover{color:var(--t2)}
+
+/* ── MAIN SCREEN (memory chat + archive) ── */
+.main-screen{padding:0}
+.main-header{
+  padding:16px 20px;background:var(--s);border-bottom:1px solid var(--b);
+  display:flex;align-items:center;gap:12px;flex-shrink:0;
+}
+.main-avatar{width:40px;height:40px;border-radius:50%;background:var(--warm-g);display:grid;place-items:center;font-size:1.2rem;flex-shrink:0;border:1px solid var(--bw)}
+.main-info{flex:1}
+.main-name{font-family:var(--fd);font-size:1rem;font-weight:600;color:var(--t)}
+.main-sub{font-size:.68rem;color:var(--t3)}
+.main-actions{display:flex;gap:6px}
+.main-btn{padding:6px 10px;background:var(--s2);border:1px solid var(--b);border-radius:var(--rx);font-size:.7rem;font-weight:600;color:var(--t2);cursor:pointer;font-family:var(--fb);transition:all .15s}
+.main-btn:hover{background:var(--s3);color:var(--t)}
+.main-btn.active{background:var(--warm-g);border-color:var(--bw);color:var(--warm)}
+
+/* ── Tabs ── */
+.tabs{display:flex;border-bottom:1px solid var(--b);flex-shrink:0}
+.tab{flex:1;padding:10px;text-align:center;font-size:.75rem;font-weight:600;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.tab.active{color:var(--warm);border-color:var(--warm)}
+
+.tab-content{flex:1;overflow-y:auto;display:none}
+.tab-content.active{display:flex;flex-direction:column}
+
+/* ── Chat tab ── */
+.mem-chat{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px}
+.mem-msg{max-width:85%;padding:12px 16px;border-radius:var(--rs);font-size:.88rem;line-height:1.6;animation:gentle .3s ease both}
+.mem-msg-them{background:var(--s2);border:1px solid var(--b);align-self:flex-start;border-bottom-left-radius:4px}
+.mem-msg-them .sender{font-size:.62rem;font-weight:700;color:var(--warm);margin-bottom:4px;letter-spacing:.5px}
+.mem-msg-you{background:var(--warm-g);border:1px solid var(--bw);align-self:flex-end;border-bottom-right-radius:4px;color:var(--t)}
+.mem-msg-note{background:var(--sage-g);border:1px solid rgba(138,181,160,.12);align-self:center;color:var(--sage);font-size:.78rem;text-align:center;border-radius:50px;padding:8px 20px;font-style:italic}
+
+.mem-input{padding:12px 16px;border-top:1px solid var(--b);display:flex;gap:8px;flex-shrink:0}
+.mem-input input{flex:1;padding:12px 16px;background:var(--s2);border:1px solid var(--b);border-radius:50px;color:var(--t);font-family:var(--fb);font-size:.88rem;outline:none}
+.mem-input input:focus{border-color:var(--warm-d)}
+.mem-input input::placeholder{color:var(--t3)}
+.mem-send{width:42px;height:42px;border-radius:50%;background:var(--warm);border:none;display:grid;place-items:center;cursor:pointer;font-size:1rem;color:var(--bg);transition:all .2s;flex-shrink:0}
+.mem-send:hover{background:var(--warm-b)}
+
+/* ── Archive tab ── */
+.archive{padding:16px;overflow-y:auto}
+.archive-card{background:var(--s2);border:1px solid var(--b);border-radius:var(--rs);padding:16px;margin-bottom:10px}
+.archive-card .ac-cat{font-size:.6rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--warm-d);margin-bottom:6px}
+.archive-card .ac-q{font-family:var(--fd);font-size:.88rem;font-style:italic;color:var(--t2);margin-bottom:6px}
+.archive-card .ac-a{font-size:.88rem;color:var(--t);line-height:1.6}
+
+/* ── Export ── */
+.export-bar{padding:12px 16px;border-top:1px solid var(--b);text-align:center;flex-shrink:0}
+
+/* ── 432 Hz ── */
+.hz{position:fixed;bottom:70px;right:16px;z-index:20;padding:6px 12px;background:rgba(10,10,14,.8);backdrop-filter:blur(8px);border:1px solid rgba(138,181,160,.2);border-radius:50px;font-size:.68rem;font-weight:600;color:var(--sage);display:none;align-items:center;gap:4px;cursor:pointer}
+.hz.on{display:flex}
+.hz .hd{width:6px;height:6px;border-radius:50%;background:var(--sage);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── Support ── */
+.support{text-align:center;padding:20px 16px}
+.support p{font-size:.72rem;color:var(--t3);margin-bottom:10px}
+.support a{display:inline-flex;align-items:center;gap:6px;padding:8px 20px;background:linear-gradient(135deg,#FF7170,#D44FA0);color:#fff;text-decoration:none;border-radius:50px;font-weight:700;font-size:.78rem;transition:transform .2s}
+.support a:hover{transform:translateY(-2px)}
+
+.legal{text-align:center;padding:16px;font-size:.62rem;color:var(--t3);line-height:1.6}
+.legal a{color:var(--warm-d);text-decoration:none}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 1: PERMISSION
+     ═══════════════════════════════════════ -->
+<div class="screen perm-screen active" id="screenPerm">
+  <div class="perm-icon">&#9875;</div>
+  <h1 class="perm-title">The Anchor <em>Remembers</em></h1>
+  <p class="perm-text">
+    A gentle space to capture the voice, stories, wisdom, and spirit of someone you love &mdash; so that when they can&rsquo;t be here, a piece of them still is.
+  </p>
+  <div class="perm-promise">
+    &ldquo;This is not a replacement for a person. It is a respectful archive of real memories, created only with full permission. Every memory stays private on your device.&rdquo;
+  </div>
+  <div class="perm-btns">
+    <button class="btn btn-warm btn-wide" onclick="showSetup()">Begin with Permission</button>
+    <button class="btn btn-ghost btn-wide" onclick="loadExisting()">I Have an Existing Archive</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 2: SETUP
+     ═══════════════════════════════════════ -->
+<div class="screen setup-screen" id="screenSetup">
+  <div class="setup-header">
+    <h2>Who Are We Remembering?</h2>
+    <p>Just the basics &mdash; we&rsquo;ll ask deeper questions next</p>
+  </div>
+  <div class="setup-body">
+    <div class="setup-field">
+      <label>Their Name</label>
+      <input type="text" id="personName" placeholder="First name or what you call them">
+    </div>
+    <div class="setup-field">
+      <label>Your Relationship</label>
+      <input type="text" id="personRelation" placeholder="e.g. My grandmother, My best friend, My father">
+    </div>
+    <div class="setup-field">
+      <label>One Word That Describes Them</label>
+      <input type="text" id="personWord" placeholder="e.g. Gentle, Brave, Joyful, Wise">
+    </div>
+    <div class="setup-field">
+      <label>A Short Description (optional)</label>
+      <div class="hint">Who are they to you? What makes them special?</div>
+      <textarea id="personDesc" placeholder="She was the kind of person who made everyone feel like they belonged..."></textarea>
+    </div>
+  </div>
+  <div class="setup-footer">
+    <button class="btn btn-warm btn-wide" onclick="startQuestions()">Continue to Memory Questions</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 3: GUIDED QUESTIONS
+     ═══════════════════════════════════════ -->
+<div class="screen q-screen" id="screenQuestions">
+  <div class="q-progress">
+    <div class="q-bar"><div class="q-bar-fill" id="qBar" style="width:0%"></div></div>
+    <div class="q-count" id="qCount">Question 1 of 25</div>
+  </div>
+  <div class="q-body">
+    <div class="q-category" id="qCat">THEIR STORY</div>
+    <div class="q-text" id="qText">Loading question...</div>
+    <div class="q-input">
+      <textarea id="qAnswer" placeholder="Take your time. There are no wrong answers."></textarea>
+    </div>
+    <div class="q-skip" onclick="skipQuestion()">Skip this one &rarr;</div>
+  </div>
+  <div class="q-footer">
+    <button class="btn btn-ghost" onclick="prevQuestion()">&#8592; Back</button>
+    <button class="btn btn-warm" onclick="nextQuestion()">Next &#8594;</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 4: MAIN (CHAT + ARCHIVE)
+     ═══════════════════════════════════════ -->
+<div class="screen main-screen" id="screenMain">
+  <div class="main-header">
+    <div class="main-avatar" id="mainAvatar">&#9875;</div>
+    <div class="main-info">
+      <div class="main-name" id="mainName">Their Name</div>
+      <div class="main-sub">Memory Archive &middot; AnchorWithin</div>
+    </div>
+    <div class="main-actions">
+      <button class="main-btn" id="btn432m" onclick="toggle432()">&#127925; 432</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('chat',this)">&#128172; Talk</div>
+    <div class="tab" onclick="switchTab('archive',this)">&#128218; Archive</div>
+    <div class="tab" onclick="switchTab('more',this)">&#9881; More</div>
+  </div>
+
+  <!-- Chat tab -->
+  <div class="tab-content active" id="tabChat">
+    <div class="mem-chat" id="memChat"></div>
+    <div class="mem-input">
+      <input type="text" id="memInput" placeholder="Talk to their memory..." autocomplete="off">
+      <button class="mem-send" onclick="sendMemChat()">&#10148;</button>
+    </div>
+  </div>
+
+  <!-- Archive tab -->
+  <div class="tab-content" id="tabArchive">
+    <div class="archive" id="archiveList"></div>
+  </div>
+
+  <!-- More tab -->
+  <div class="tab-content" id="tabMore" style="padding:16px;overflow-y:auto">
+    <div style="margin-bottom:16px">
+      <button class="btn btn-ghost btn-wide" onclick="addMoreMemories()">&#10133; Add More Memories</button>
+    </div>
+    <div style="margin-bottom:16px">
+      <button class="btn btn-ghost btn-wide" onclick="exportArchive()">&#128190; Export Archive (JSON)</button>
+    </div>
+    <div style="margin-bottom:16px">
+      <button class="btn btn-ghost btn-wide" onclick="exportReadable()">&#128196; Export as Readable Text</button>
+    </div>
+    <div class="support">
+      <p>The Anchor Remembers is a free tool by AnchorWithin.<br>If it brought you comfort, you can support the mission.</p>
+      <a href="https://ko-fi.com/anchorwithin" target="_blank" rel="noopener">&#9749; Support AnchorWithin</a>
+    </div>
+    <div class="legal">
+      &copy; 2026 AnchorWithin LLC<br>All memories stay on your device. We never see or store your data.<br>
+      <a href="https://youtube.com/@AnchorWithin">YouTube</a> &middot; <a href="https://ko-fi.com/anchorwithin">Ko-fi</a>
+    </div>
+  </div>
+</div>
+
+<div class="hz" id="hzBadge" onclick="toggle432()"><span class="hd"></span>432 Hz</div>
+
+<script>
+/* ═══════════════════════════════════════
+   QUESTION DATABASE
+   ═══════════════════════════════════════ */
+const QUESTIONS=[
+  {cat:'Their Story',q:"What is the first memory you have of them?"},
+  {cat:'Their Story',q:"Where did they grow up? What was their childhood like?"},
+  {cat:'Their Story',q:"What did they do for a living, and how did they feel about it?"},
+  {cat:'Their Story',q:"What was the happiest time of their life?"},
+  {cat:'Their Voice',q:"What did they sound like when they laughed?"},
+  {cat:'Their Voice',q:"What phrase or saying did they repeat most often?"},
+  {cat:'Their Voice',q:"What did they call you? Did they have a special nickname for you?"},
+  {cat:'Their Voice',q:"How did they greet you when you walked through the door?"},
+  {cat:'Their Heart',q:"What made them cry? What moved them deeply?"},
+  {cat:'Their Heart',q:"Who did they love the most in this world?"},
+  {cat:'Their Heart',q:"What did they worry about?"},
+  {cat:'Their Heart',q:"How did they show love? What was their love language?"},
+  {cat:'Their Wisdom',q:"What was the best advice they ever gave you?"},
+  {cat:'Their Wisdom',q:"What life lesson did they teach you without even trying?"},
+  {cat:'Their Wisdom',q:"What did they believe in most strongly?"},
+  {cat:'Their Wisdom',q:"If they could give you one more piece of advice right now, what would it be?"},
+  {cat:'Their Joy',q:"What made them laugh the hardest?"},
+  {cat:'Their Joy',q:"What was their favorite food, drink, or comfort meal?"},
+  {cat:'Their Joy',q:"What song, movie, or book reminds you most of them?"},
+  {cat:'Their Joy',q:"What hobby or activity lit them up inside?"},
+  {cat:'Their Spirit',q:"What was their superpower \u2014 the thing they were best at?"},
+  {cat:'Their Spirit',q:"How did they handle hard times? What kept them going?"},
+  {cat:'Their Spirit',q:"What would they want you to know right now?"},
+  {cat:'Their Spirit',q:"If you could have one more conversation with them, what would you say?"},
+  {cat:'Their Spirit',q:"What about them do you hope to carry forward in your own life?"},
+];
+
+/* ═══════════════════════════════════════
+   STATE
+   ═══════════════════════════════════════ */
+let person={name:'',relation:'',word:'',desc:''};
+let answers={}; // qIndex -> answer text
+let qIndex=0;
+
+function save(){
+  try{
+    localStorage.setItem('aw_anchor_remembers',JSON.stringify({person,answers,version:1}));
+  }catch(e){}
+}
+
+function load(){
+  try{
+    const d=JSON.parse(localStorage.getItem('aw_anchor_remembers'));
+    if(d&&d.person&&d.person.name){person=d.person;answers=d.answers||{};return true;}
+  }catch(e){}
+  return false;
+}
+
+/* ═══════════════════════════════════════
+   NAVIGATION
+   ═══════════════════════════════════════ */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showSetup(){showScreen('screenSetup')}
+
+function loadExisting(){
+  if(load()){
+    goToMain();
+  } else {
+    alert('No existing archive found on this device. Let\u2019s start fresh.');
+  }
+}
+
+function startQuestions(){
+  person.name=document.getElementById('personName').value.trim()||'Them';
+  person.relation=document.getElementById('personRelation').value.trim();
+  person.word=document.getElementById('personWord').value.trim();
+  person.desc=document.getElementById('personDesc').value.trim();
+  if(!person.name){document.getElementById('personName').focus();return;}
+  qIndex=0;
+  renderQuestion();
+  showScreen('screenQuestions');
+}
+
+function renderQuestion(){
+  const q=QUESTIONS[qIndex];
+  const personalized=q.q.replace(/they|them|their/gi,m=>{
+    if(m==='they'||m==='They') return person.name;
+    if(m==='them'||m==='Them') return person.name;
+    if(m==='their'||m==='Their') return person.name+"'s";
+    return m;
+  });
+  document.getElementById('qCat').textContent=q.cat.toUpperCase();
+  document.getElementById('qText').textContent=personalized;
+  document.getElementById('qAnswer').value=answers[qIndex]||'';
+  document.getElementById('qBar').style.width=((qIndex+1)/QUESTIONS.length*100)+'%';
+  document.getElementById('qCount').textContent=`Question ${qIndex+1} of ${QUESTIONS.length}`;
+  document.getElementById('qAnswer').focus();
+}
+
+function saveCurrentAnswer(){
+  const val=document.getElementById('qAnswer').value.trim();
+  if(val) answers[qIndex]=val;
+}
+
+function nextQuestion(){
+  saveCurrentAnswer();
+  if(qIndex<QUESTIONS.length-1){qIndex++;renderQuestion();}
+  else{save();goToMain();}
+}
+
+function prevQuestion(){
+  saveCurrentAnswer();
+  if(qIndex>0){qIndex--;renderQuestion();}
+}
+
+function skipQuestion(){
+  if(qIndex<QUESTIONS.length-1){qIndex++;renderQuestion();}
+  else{save();goToMain();}
+}
+
+function addMoreMemories(){
+  qIndex=0;renderQuestion();showScreen('screenQuestions');
+}
+
+/* ═══════════════════════════════════════
+   MAIN SCREEN
+   ═══════════════════════════════════════ */
+function goToMain(){
+  save();
+  document.getElementById('mainName').textContent=person.name;
+  renderArchive();
+  showScreen('screenMain');
+
+  // Welcome message
+  const chat=document.getElementById('memChat');
+  chat.innerHTML='';
+  addMemNote(`This is ${person.name}'s memory space. Everything here comes from real answers and real love.`);
+
+  const answeredQs=Object.keys(answers).map(Number).filter(i=>answers[i]);
+  if(answeredQs.length>0){
+    const randomIdx=answeredQs[Math.floor(Math.random()*answeredQs.length)];
+    const q=QUESTIONS[randomIdx];
+    setTimeout(()=>{
+      addMemMsg(`You once told me that when asked "${q.q.toLowerCase()}", the answer was:\n\n"${answers[randomIdx]}"`,person.name);
+    },1000);
+  } else {
+    setTimeout(()=>{addMemMsg("No memories recorded yet. Go to the Archive tab and add some memories to get started.",person.name)},800);
+  }
+}
+
+function addMemMsg(text,sender){
+  const chat=document.getElementById('memChat');
+  const div=document.createElement('div');
+  div.className='mem-msg mem-msg-them';
+  div.innerHTML=`<div class="sender">\u2693 ${sender}</div>${text.replace(/\n/g,'<br>')}`;
+  chat.appendChild(div);chat.scrollTop=chat.scrollHeight;
+}
+
+function addMemUser(text){
+  const chat=document.getElementById('memChat');
+  const div=document.createElement('div');
+  div.className='mem-msg mem-msg-you';
+  div.textContent=text;
+  chat.appendChild(div);chat.scrollTop=chat.scrollHeight;
+}
+
+function addMemNote(text){
+  const chat=document.getElementById('memChat');
+  const div=document.createElement('div');
+  div.className='mem-msg mem-msg-note';
+  div.textContent=text;
+  chat.appendChild(div);chat.scrollTop=chat.scrollHeight;
+}
+
+function sendMemChat(){
+  const input=document.getElementById('memInput');
+  const text=input.value.trim();if(!text)return;
+  addMemUser(text);input.value='';
+
+  const lower=text.toLowerCase();
+  const answeredQs=Object.keys(answers).map(Number).filter(i=>answers[i]);
+
+  setTimeout(()=>{
+    // Try to match user's question to a stored memory
+    let bestMatch=null,bestScore=0;
+    const inputWords=lower.split(/\s+/);
+
+    answeredQs.forEach(idx=>{
+      const q=QUESTIONS[idx].q.toLowerCase();
+      const a=answers[idx].toLowerCase();
+      let score=0;
+      inputWords.forEach(w=>{
+        if(w.length>3&&(q.includes(w)||a.includes(w))) score++;
+      });
+      if(score>bestScore){bestScore=score;bestMatch=idx;}
+    });
+
+    // Keywords for specific topics
+    const topicMap={
+      'advice':[12,13,15],
+      'wisdom':[12,13,14,15],
+      'laugh':[16,4],
+      'happy':[3,16,17,18,19],
+      'sad':[8,10],
+      'love':[9,11],
+      'food':[17],
+      'music':[18],'song':[18],
+      'hobby':[19],
+      'strong':[20,21],
+      'child':[1],
+      'work':[2],'job':[2],
+      'say':[5,6,7],
+      'call':[6],
+      'miss':[22,23,24],
+    };
+
+    // Check topic keywords
+    for(const[keyword,indices]of Object.entries(topicMap)){
+      if(lower.includes(keyword)){
+        const valid=indices.filter(i=>answers[i]);
+        if(valid.length>0){
+          const pick=valid[Math.floor(Math.random()*valid.length)];
+          addMemMsg(answers[pick],person.name);
+          return;
+        }
+      }
+    }
+
+    // Use best match if found
+    if(bestMatch!==null&&bestScore>=1){
+      addMemMsg(answers[bestMatch],person.name);
+      return;
+    }
+
+    // Fallback: share a random memory
+    if(answeredQs.length>0){
+      const randomIdx=answeredQs[Math.floor(Math.random()*answeredQs.length)];
+      const q=QUESTIONS[randomIdx];
+      addMemMsg(`I may not have the exact answer, but here's something:\n\nWhen asked "${q.q.toLowerCase()}":\n\n"${answers[randomIdx]}"`,person.name);
+    } else {
+      addMemNote("No memories recorded yet. Add memories through the guided questions to hear from "+person.name+".");
+    }
+  },800+Math.random()*600);
+}
+
+document.getElementById('memInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMemChat()});
+
+/* ═══════════════════════════════════════
+   ARCHIVE TAB
+   ═══════════════════════════════════════ */
+function renderArchive(){
+  const list=document.getElementById('archiveList');
+  const answeredQs=Object.keys(answers).map(Number).filter(i=>answers[i]).sort((a,b)=>a-b);
+  if(answeredQs.length===0){
+    list.innerHTML='<p style="text-align:center;color:var(--t3);padding:40px 16px;font-style:italic">No memories recorded yet. Complete the guided questions to build the archive.</p>';
+    return;
+  }
+  list.innerHTML=answeredQs.map(i=>{
+    const q=QUESTIONS[i];
+    return `<div class="archive-card"><div class="ac-cat">${q.cat}</div><div class="ac-q">"${q.q}"</div><div class="ac-a">${answers[i]}</div></div>`;
+  }).join('');
+}
+
+function switchTab(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab'+name.charAt(0).toUpperCase()+name.slice(1)).classList.add('active');
+  if(name==='archive') renderArchive();
+}
+
+/* ═══════════════════════════════════════
+   EXPORT
+   ═══════════════════════════════════════ */
+function exportArchive(){
+  const data=JSON.stringify({person,answers,questions:QUESTIONS,exported:new Date().toISOString()},null,2);
+  const blob=new Blob([data],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`anchor-remembers-${person.name.toLowerCase().replace(/\s/g,'-')}.json`;
+  a.click();URL.revokeObjectURL(url);
+}
+
+function exportReadable(){
+  const answeredQs=Object.keys(answers).map(Number).filter(i=>answers[i]).sort((a,b)=>a-b);
+  let text=`The Anchor Remembers: ${person.name}\n`;
+  text+=`Relationship: ${person.relation}\n`;
+  text+=`In one word: ${person.word}\n`;
+  if(person.desc) text+=`\n${person.desc}\n`;
+  text+=`\n${'='.repeat(50)}\n\n`;
+
+  let lastCat='';
+  answeredQs.forEach(i=>{
+    const q=QUESTIONS[i];
+    if(q.cat!==lastCat){text+=`\n--- ${q.cat.toUpperCase()} ---\n\n`;lastCat=q.cat;}
+    text+=`Q: ${q.q}\n`;
+    text+=`A: ${answers[i]}\n\n`;
+  });
+
+  text+=`\n${'='.repeat(50)}\nCaptured with love using The Anchor Remembers by AnchorWithin\n`;
+
+  const blob=new Blob([text],{type:'text/plain'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`memories-of-${person.name.toLowerCase().replace(/\s/g,'-')}.txt`;
+  a.click();URL.revokeObjectURL(url);
+}
+
+/* ═══════════════════════════════════════
+   432 Hz
+   ═══════════════════════════════════════ */
+let audioCtx=null,osc=null,gain=null,toneOn=false;
+function toggle432(){
+  if(!toneOn){
+    if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==='suspended')audioCtx.resume();
+    osc=audioCtx.createOscillator();osc.type='sine';osc.frequency.value=432;
+    gain=audioCtx.createGain();gain.gain.value=0;
+    osc.connect(gain);gain.connect(audioCtx.destination);osc.start();
+    gain.gain.setTargetAtTime(.08,audioCtx.currentTime,.8);
+    toneOn=true;
+  } else {
+    gain.gain.setTargetAtTime(0,audioCtx.currentTime,.5);
+    setTimeout(()=>{try{osc.stop()}catch(e){}},800);
+    toneOn=false;
+  }
+  document.getElementById('btn432m').classList.toggle('active',toneOn);
+  document.getElementById('hzBadge').classList.toggle('on',toneOn);
+}
+
+/* ═══════════════════════════════════════
+   INIT: Check for existing archive
+   ═══════════════════════════════════════ */
+if(load()){
+  // Has existing data — offer to resume
+  document.querySelector('.perm-btns').innerHTML=`
+    <button class="btn btn-warm btn-wide" onclick="goToMain()">Return to ${person.name}'s Memories</button>
+    <button class="btn btn-ghost btn-wide" onclick="showSetup()">Start New Archive</button>
+  `;
+}
+</script>
+</body>
+</html>
