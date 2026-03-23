@@ -268,6 +268,9 @@ input::placeholder,textarea::placeholder{color:var(--t3)}
     <div style="margin-bottom:16px">
       <button class="btn btn-ghost btn-wide" onclick="exportReadable()">&#128196; Export as Readable Text</button>
     </div>
+    <div style="margin-bottom:16px">
+      <button class="btn btn-warm btn-wide" onclick="unlockPro()">&#127775; Unlock Premium &mdash; $4.99</button>
+    </div>
     <div class="support">
       <p>The Anchor Remembers is a free tool by AnchorWithin.<br>If it brought you comfort, you can support the mission.</p>
       <a href="https://ko-fi.com/anchorwithin" target="_blank" rel="noopener">&#9749; Support AnchorWithin</a>
@@ -620,6 +623,13 @@ if(load()){
     <button class="btn btn-ghost btn-wide" onclick="showSetup()">Start New Archive</button>
   `;
 }
+
+function unlockPro(){
+  window.location.href = 'https://buy.stripe.com/dRm4gAfdI22b6sffj467S0b';
+}
+(function(){
+  if(new URLSearchParams(location.search).get('paid'))try{localStorage.setItem('aw_remembers_pro','1')}catch(e){}
+})();
 </script>
 </body>
 </html>
