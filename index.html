@@ -242,6 +242,24 @@ input::placeholder,textarea::placeholder{color:var(--t3)}
   </div>
 </div>
 
+
+<!-- Memory Gate Overlay -->
+<div id="memGate" style="display:none;position:fixed;inset:0;z-index:100;flex-direction:column;align-items:center;justify-content:center;background:rgba(10,12,18,.92);backdrop-filter:blur(12px);text-align:center;padding:32px">
+  <div style="font-size:2rem;margin-bottom:12px">&#128274;</div>
+  <div style="font-weight:700;font-size:1.1rem;color:#E6E4DF;margin-bottom:8px">5 Free Memories Saved</div>
+  <div style="font-size:.85rem;color:#9A978F;margin-bottom:24px;max-width:280px;line-height:1.6">You've captured 5 memories for free.<br>Unlock Premium to save all 25 guided questions and preserve their full story.</div>
+  <button onclick="unlockPro()" style="display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:#C4956A;border:none;border-radius:10px;font-weight:700;font-size:.9rem;color:#fff;cursor:pointer;margin-bottom:12px">&#127775; Unlock Premium &mdash; $4.99</button>
+  <div style="font-size:.72rem;color:#585650;margin-top:4px">One-time payment &middot; Your memories stay private on your device</div>
+</div>
+
+<!-- Memory Gate Overlay -->
+<div id="memGate" style="display:none;position:fixed;inset:0;z-index:100;flex-direction:column;align-items:center;justify-content:center;background:rgba(10,12,18,.92);backdrop-filter:blur(12px);text-align:center;padding:32px">
+  <div style="font-size:2rem;margin-bottom:12px">&#128274;</div>
+  <div style="font-weight:700;font-size:1.1rem;color:#EDE7DA;margin-bottom:8px">5 Free Memories Saved</div>
+  <div style="font-size:.85rem;color:#9A978F;margin-bottom:24px;max-width:280px;line-height:1.6">You've captured 5 memories for free.<br>Unlock Premium to preserve their full story &mdash; all 25 guided questions.</div>
+  <button onclick="unlockPro()" style="display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:#C4956A;border:none;border-radius:10px;font-weight:700;font-size:.9rem;color:#fff;cursor:pointer;margin-bottom:12px">&#127775; Unlock Premium &mdash; $4.99</button>
+  <div style="font-size:.72rem;color:#585650;margin-top:4px">One-time &middot; Your memories stay private on your device</div>
+</div>
 <!-- ═══════════════════════════════════════
      SCREEN 4: MAIN (CHAT + ARCHIVE)
      ═══════════════════════════════════════ -->
@@ -289,7 +307,7 @@ input::placeholder,textarea::placeholder{color:var(--t3)}
       <button class="btn btn-ghost btn-wide" onclick="exportReadable()">&#128196; Export as Readable Text</button>
     </div>
     <div style="margin-bottom:16px">
-      <button class="btn btn-warm btn-wide" onclick="unlockPro()">&#127775; Unlock Unlimited &mdash; $0.99</button>
+      <button class="btn btn-warm btn-wide" onclick="unlockPro()">&#127775; Unlock Premium &mdash; $4.99</button>
     </div>
     <div class="support">
       <p>The Anchor Remembers is a free tool by AnchorWithin.<br>If it brought you comfort, you can support the mission.</p>
@@ -342,6 +360,8 @@ const QUESTIONS=[
 let person={name:'',relation:'',word:'',desc:''};
 let answers={}; // qIndex -> answer text
 let qIndex=0;
+let isPro=false;
+let isPro=false;
 
 function save(){
   try{
@@ -409,6 +429,11 @@ function saveCurrentAnswer(){
 
 function nextQuestion(){
   saveCurrentAnswer();
+  const _saved=Object.keys(answers).filter(k=>answers[k]).length;
+  if(!isPro && _saved>=5){
+    document.getElementById('memGate').style.display='flex';
+    return;
+  }
   if(qIndex<QUESTIONS.length-1){qIndex++;renderQuestion();}
   else{save();goToMain();}
 }
@@ -644,23 +669,14 @@ if(load()){
   `;
 }
 
-function getMemCount(){try{var p=localStorage.getItem('aw_person');if(!p)return 0;var d=JSON.parse(p);return Object.values(d.answers||{}).filter(function(v){return v&&v.trim();}).length;}catch(e){return 0;}}
-function checkMemGate(){var pro=localStorage.getItem('aw_remembers_pro');if(!pro&&getMemCount()>=5){if(confirm('You\'ve saved 5 memories free. Unlock unlimited for $0.99?'))unlockPro();return false;}return true;}
 function unlockPro(){
-  window.location.href = 'https://buy.stripe.com/8x2bJ21mS8qz6sf5Iu67S0q';
+  window.location.href = 'https://buy.stripe.com/dRm4gAfdI22b6sffj467S0b';
 }
 (function(){
-  if(new URLSearchParams(location.search).get('paid')||new URLSearchParams(location.search).get('unlocked'))try{localStorage.setItem('aw_remembers_pro','1')}catch(e){}
+  if(new URLSearchParams(location.search).get('paid')){try{localStorage.setItem('aw_remembers_pro','1')}catch(e){}isPro=true;}
+  try{if(localStorage.getItem('aw_remembers_pro')){isPro=true;}}catch(e){}
 })();
 </script>
-
-
-<div style="margin:20px 16px 8px;padding:18px 16px;background:rgba(200,168,75,.09);border:1px solid rgba(200,168,75,.3);border-radius:12px;text-align:center">
-  <div style="font-size:.65rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#C8A84B;margin-bottom:8px">SAVE 75%</div>
-  <div style="font-size:1rem;font-weight:700;color:#EDE7DA;margin-bottom:6px">Get ALL 6 Tools for $4.99</div>
-  <div style="font-size:.78rem;color:#9A978F;margin-bottom:14px">Resume Optimizer &middot; Tax Calculator &middot; Resonance Generator &middot; Side Hustle Planner &middot; AI Companion &middot; Anchor Remembers</div>
-  <a href="https://buy.stripe.com/3cI7sM7Lg6ir5obef067S0r" target="_blank" rel="noopener" style="display:inline-block;padding:10px 22px;background:#C8A84B;color:#08101E;font-weight:700;font-size:.85rem;border-radius:8px;text-decoration:none;letter-spacing:.3px">Get the Bundle &rarr;</a>
-</div>
 
 <!-- AnchorWithin Footer -->
 <style>
