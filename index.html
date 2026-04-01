@@ -2,723 +2,558 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>The Anchor Remembers — A Digital Memory Companion</title>
-<meta name="description" content="Capture the voice, stories, and wisdom of someone you love. A gentle memory archive by AnchorWithin.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anchor Remembers — Digital Memory Companion | AnchorWithin</title>
+<meta name="description" content="Capture life stories with guided prompts, photo uploads, and export to PDF. A warm memory archive for families.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#0A0A0E;--s:#111116;--s2:#18181E;--s3:#202028;
-  --b:rgba(255,255,255,.05);--bw:rgba(210,190,150,.15);
-  --warm:#D2BE96;--warm-b:#E8D4AE;--warm-d:#8A7A5A;--warm-g:rgba(210,190,150,.07);
-  --sage:#8AB5A0;--sage-g:rgba(138,181,160,.08);
-  --rose:#D4A0A8;--rose-g:rgba(212,160,168,.08);
-  --t:#E8E4DC;--t2:#A09C94;--t3:#5C5A54;
-  --fd:'Lora',Georgia,serif;--fb:'Karla',system-ui,sans-serif;
-  --r:16px;--rs:12px;--rx:8px;
+:root {
+  --navy:#0A0C18; --navy-mid:#0F1220; --navy-card:#151826; --navy-lift:#1C2030;
+  --warm:#C9A96A; --warm-light:#E2C48A; --warm-dim:rgba(201,169,106,0.15);
+  --sage:#7BB89A; --rose:#D4849A; --blue:#7BA8D4;
+  --cream:#EAE4D8; --cream-dim:rgba(234,228,216,0.58); --cream-faint:rgba(234,228,216,0.07);
+  --border:rgba(201,169,106,0.18); --border-soft:rgba(234,228,216,0.07);
+  --r:18px; --rs:12px; --rx:8px;
+  --transition:0.22s cubic-bezier(0.4,0,0.2,1);
+  --shadow:0 8px 40px rgba(0,0,0,0.5);
 }
-*{margin:0;padding:0;box-sizing:border-box}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:var(--fb);background:var(--bg);color:var(--t);min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 20%,rgba(210,190,150,.03),transparent);pointer-events:none;z-index:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--navy);color:var(--cream);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 70% 50% at 30% 20%,rgba(201,169,106,0.05) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 70% 80%,rgba(123,184,154,0.04) 0%,transparent 50%);pointer-events:none}
 
-/* ── SCREENS ── */
-.screen{display:none;min-height:100vh;min-height:100dvh;position:relative;z-index:2}
-.screen.active{display:flex;flex-direction:column}
+/* Layout */
+.app{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:0 20px 80px}
 
-/* ── PERMISSION SCREEN ── */
-.perm-screen{align-items:center;justify-content:center;text-align:center;padding:40px 24px}
-.perm-icon{font-size:2.5rem;margin-bottom:16px;opacity:0;animation:gentle 1s .2s ease both}
-.perm-title{font-family:var(--fd);font-size:clamp(1.6rem,5vw,2.2rem);font-weight:400;color:var(--t);margin-bottom:12px;opacity:0;animation:gentle 1s .4s ease both}
-.perm-title em{font-style:italic;color:var(--warm)}
-.perm-text{font-size:.9rem;color:var(--t2);max-width:380px;line-height:1.7;font-weight:300;margin-bottom:28px;opacity:0;animation:gentle 1s .6s ease both}
-.perm-promise{font-family:var(--fd);font-size:.85rem;font-style:italic;color:var(--sage);max-width:340px;line-height:1.6;margin-bottom:32px;padding:16px;border:1px solid rgba(138,181,160,.15);border-radius:var(--r);background:var(--sage-g);opacity:0;animation:gentle 1s .8s ease both}
-.perm-btns{display:flex;flex-direction:column;gap:10px;width:100%;max-width:300px;opacity:0;animation:gentle 1s 1s ease both}
+/* Header */
+header{display:flex;align-items:center;justify-content:space-between;padding:22px 0 14px;border-bottom:1px solid var(--border-soft)}
+.logo{display:flex;align-items:center;gap:10px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:1rem;color:var(--cream);text-decoration:none}
+.logo-icon{width:30px;height:30px;background:linear-gradient(135deg,var(--warm),var(--warm-light));border-radius:8px;display:grid;place-items:center;font-size:.9rem}
+.nav-btns{display:flex;gap:8px}
+.nav-btn{padding:6px 14px;background:var(--navy-card);border:1px solid var(--border-soft);color:var(--cream-dim);border-radius:var(--rx);font-size:.72rem;font-weight:600;cursor:pointer;transition:var(--transition)}
+.nav-btn:hover{border-color:var(--border);color:var(--cream)}
+.nav-btn.active{border-color:var(--warm);color:var(--warm);background:var(--warm-dim)}
+
+/* Screens */
+.screen{display:none}
+.screen.active{display:block}
+
+/* Welcome */
+.welcome{text-align:center;padding:48px 20px}
+.welcome-ornament{font-size:3rem;margin-bottom:16px;opacity:0;animation:gentle 1s .1s both}
+.welcome h1{font-family:'Lora',serif;font-size:clamp(1.8rem,5vw,2.6rem);font-weight:400;line-height:1.2;margin-bottom:12px;opacity:0;animation:gentle 1s .25s both}
+.welcome h1 em{font-style:italic;color:var(--warm)}
+.welcome p{font-size:.92rem;color:var(--cream-dim);max-width:440px;margin:0 auto 28px;line-height:1.75;opacity:0;animation:gentle 1s .4s both}
+.welcome-promise{font-family:'Lora',serif;font-style:italic;font-size:.85rem;color:var(--sage);padding:14px 20px;border:1px solid rgba(123,184,154,0.2);border-radius:var(--r);background:rgba(123,184,154,0.05);max-width:420px;margin:0 auto 28px;opacity:0;animation:gentle 1s .55s both}
+.welcome-btns{display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0;animation:gentle 1s .7s both}
+
+/* Whose memory */
+.whose-card{background:var(--navy-card);border:1px solid var(--border-soft);border-radius:var(--r);padding:24px;margin-bottom:20px}
+.whose-card h3{font-family:'Lora',serif;font-size:1.1rem;font-weight:400;margin-bottom:16px;color:var(--cream)}
+.whose-options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:480px){.whose-options{grid-template-columns:1fr}}
+.whose-opt{padding:14px;background:var(--navy-lift);border:1px solid var(--border-soft);border-radius:var(--rs);cursor:pointer;text-align:center;transition:var(--transition)}
+.whose-opt:hover{border-color:var(--border);transform:translateY(-1px)}
+.whose-opt.selected{border-color:var(--warm);background:var(--warm-dim)}
+.whose-icon{font-size:1.4rem;margin-bottom:6px}
+.whose-name{font-size:.8rem;font-weight:600;color:var(--cream)}
+.whose-desc{font-size:.68rem;color:var(--cream-dim);margin-top:2px}
+.input-field-wrap{margin-top:12px}
+.text-input{width:100%;background:var(--navy-lift);border:1px solid var(--border-soft);color:var(--cream);padding:11px 14px;border-radius:var(--rs);font-family:'Plus Jakarta Sans',sans-serif;font-size:.9rem;outline:none;transition:border-color var(--transition)}
+.text-input:focus{border-color:var(--warm)}
+.text-input::placeholder{color:rgba(234,228,216,0.3)}
+
+/* Prompts screen */
+.prompts-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.prompts-header h2{font-family:'Lora',serif;font-size:1.3rem;font-weight:400}
+.prompt-progress{font-size:.72rem;color:var(--cream-dim)}
+
+/* Prompt categories */
+.cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.cat-tab{padding:6px 14px;background:var(--navy-card);border:1px solid var(--border-soft);border-radius:20px;font-size:.7rem;font-weight:600;color:var(--cream-dim);cursor:pointer;transition:var(--transition)}
+.cat-tab:hover{color:var(--cream)}
+.cat-tab.active{border-color:var(--warm);color:var(--warm);background:var(--warm-dim)}
+
+/* Prompt card */
+.prompt-card{background:var(--navy-card);border:1px solid var(--border-soft);border-radius:var(--r);padding:20px;margin-bottom:14px;transition:var(--transition);cursor:pointer}
+.prompt-card:hover{border-color:var(--border)}
+.prompt-card.answered{border-color:rgba(123,184,154,0.4)}
+.prompt-card.expanded{border-color:var(--warm)}
+.prompt-header{display:flex;align-items:flex-start;gap:12px}
+.prompt-num{font-size:.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--warm);min-width:30px;padding-top:3px}
+.prompt-q{font-family:'Lora',serif;font-size:.98rem;font-weight:400;line-height:1.5;flex:1}
+.prompt-status{font-size:.8rem;flex-shrink:0;padding-top:2px}
+.prompt-body{display:none;margin-top:14px}
+.prompt-card.expanded .prompt-body{display:block}
+.prompt-textarea{width:100%;background:var(--navy-lift);border:1px solid var(--border-soft);color:var(--cream);padding:12px 14px;border-radius:var(--rs);font-family:'Lora',serif;font-size:.88rem;line-height:1.7;resize:vertical;min-height:120px;outline:none;transition:border-color var(--transition)}
+.prompt-textarea:focus{border-color:var(--warm)}
+.prompt-textarea::placeholder{color:rgba(234,228,216,0.25)}
+.prompt-tools{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+.photo-thumb-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.photo-thumb{width:64px;height:64px;border-radius:var(--rx);object-fit:cover;border:1px solid var(--border-soft)}
+.followup-box{background:rgba(123,184,154,0.06);border:1px solid rgba(123,184,154,0.15);border-radius:var(--rs);padding:12px;margin-top:12px}
+.followup-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--sage);margin-bottom:6px}
+.followup-q{font-family:'Lora',serif;font-size:.85rem;font-style:italic;color:var(--cream-dim)}
+
+/* Memories gallery */
+.memories-grid{display:grid;gap:14px}
+.memory-card{background:var(--navy-card);border:1px solid var(--border-soft);border-radius:var(--r);padding:18px;transition:var(--transition)}
+.memory-card:hover{border-color:var(--border)}
+.memory-meta{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.memory-num{font-size:.65rem;font-weight:700;color:var(--warm);letter-spacing:.06em;text-transform:uppercase}
+.memory-date{font-size:.65rem;color:var(--cream-dim)}
+.memory-q{font-family:'Lora',serif;font-size:.82rem;font-style:italic;color:var(--cream-dim);margin-bottom:8px;line-height:1.5}
+.memory-text{font-family:'Lora',serif;font-size:.9rem;line-height:1.75;color:var(--cream)}
+.memory-photos{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.memory-photo{width:72px;height:72px;border-radius:var(--rx);object-fit:cover;border:1px solid var(--border-soft);cursor:pointer}
+.memory-photo:hover{transform:scale(1.05)}
+.memory-empty{text-align:center;padding:48px 20px;color:var(--cream-dim)}
+.memory-empty-icon{font-size:2.5rem;margin-bottom:12px}
+
+/* Stats bar */
+.stats-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}
+.stat-card{background:var(--navy-card);border:1px solid var(--border-soft);border-radius:var(--rs);padding:14px;text-align:center}
+.stat-val{font-family:'Lora',serif;font-size:1.5rem;font-weight:500;color:var(--warm-light);margin-bottom:2px}
+.stat-label{font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--cream-dim)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 20px;border:none;border-radius:var(--rs);font-family:'Plus Jakarta Sans',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:var(--transition);text-decoration:none}
+.btn-warm{background:linear-gradient(135deg,var(--warm),var(--warm-light));color:var(--navy)}
+.btn-warm:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--cream-dim)}
+.btn-outline:hover{border-color:var(--warm);color:var(--warm)}
+.btn-sage{background:rgba(123,184,154,0.12);border:1px solid rgba(123,184,154,0.25);color:var(--sage)}
+.btn-sage:hover{background:rgba(123,184,154,0.2)}
+.btn-sm{padding:7px 12px;font-size:.72rem}
+.btn-wide{width:100%}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+
+/* Share link */
+.share-card{background:var(--navy-card);border:1px solid var(--border-soft);border-radius:var(--r);padding:18px;margin-top:20px}
+.share-card h4{font-size:.85rem;font-weight:700;margin-bottom:6px}
+.share-link-row{display:flex;gap:8px;margin-top:10px}
+.share-link-input{flex:1;background:var(--navy-lift);border:1px solid var(--border-soft);color:var(--cream-dim);padding:9px 12px;border-radius:var(--rs);font-size:.78rem;font-family:'Inter',monospace}
+
+/* Photo lightbox */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;display:none;align-items:center;justify-content:center}
+.lightbox.open{display:flex}
+.lightbox img{max-width:90vw;max-height:85vh;border-radius:var(--rs);object-fit:contain}
+.lightbox-close{position:absolute;top:20px;right:20px;background:rgba(255,255,255,.1);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:grid;place-items:center}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--navy-lift);border:1px solid var(--border);color:var(--cream);padding:10px 20px;border-radius:30px;font-size:.82rem;font-weight:600;z-index:300;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
 @keyframes gentle{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  padding:14px 28px;border:none;border-radius:var(--rs);
-  font-family:var(--fb);font-size:.88rem;font-weight:600;
-  cursor:pointer;transition:all .25s;text-decoration:none;
-}
-.btn-warm{background:var(--warm);color:var(--bg)}
-.btn-warm:hover{background:var(--warm-b);transform:translateY(-1px);box-shadow:0 8px 24px rgba(210,190,150,.2)}
-.btn-ghost{background:transparent;border:1px solid var(--warm-d);color:var(--warm)}
-.btn-ghost:hover{background:var(--warm-g)}
-.btn-wide{width:100%}
-
-/* ── SETUP SCREEN ── */
-.setup-screen{padding:0}
-.setup-header{padding:28px 20px;text-align:center;border-bottom:1px solid var(--b)}
-.setup-header h2{font-family:var(--fd);font-size:1.3rem;font-weight:500;color:var(--t)}
-.setup-header p{font-size:.78rem;color:var(--t3);margin-top:4px}
-.setup-body{flex:1;overflow-y:auto;padding:20px 16px}
-.setup-field{margin-bottom:16px}
-.setup-field label{display:block;font-family:var(--fd);font-size:.9rem;color:var(--t);margin-bottom:6px;font-weight:500}
-.setup-field .hint{font-size:.72rem;color:var(--t3);margin-bottom:6px;font-style:italic}
-input[type="text"],textarea{
-  width:100%;padding:13px 14px;background:var(--s2);border:1px solid var(--b);
-  border-radius:var(--rs);color:var(--t);font-family:var(--fb);font-size:.9rem;
-  outline:none;transition:border-color .2s;line-height:1.5;
-}
-textarea{resize:vertical;min-height:80px}
-input:focus,textarea:focus{border-color:var(--warm-d)}
-input::placeholder,textarea::placeholder{color:var(--t3)}
-.setup-footer{padding:16px;border-top:1px solid var(--b);flex-shrink:0}
-
-/* ── QUESTIONS SCREEN ── */
-.q-screen{padding:0}
-.q-progress{padding:12px 16px;background:var(--s);border-bottom:1px solid var(--b);flex-shrink:0}
-.q-bar{height:4px;background:var(--s3);border-radius:4px;overflow:hidden}
-.q-bar-fill{height:100%;background:var(--warm);border-radius:4px;transition:width .5s ease}
-.q-count{font-size:.68rem;color:var(--t3);margin-top:6px;text-align:center}
-.q-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center}
-.q-category{font-size:.62rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--warm-d);margin-bottom:12px}
-.q-text{font-family:var(--fd);font-size:clamp(1.1rem,4vw,1.5rem);font-weight:400;font-style:italic;color:var(--t);max-width:400px;line-height:1.5;margin-bottom:24px}
-.q-input{width:100%;max-width:420px}
-.q-input textarea{min-height:100px;font-family:var(--fd);font-size:.95rem}
-.q-footer{padding:16px;border-top:1px solid var(--b);display:flex;gap:10px;flex-shrink:0}
-.q-footer .btn{flex:1}
-.q-skip{font-size:.78rem;color:var(--t3);cursor:pointer;text-align:center;padding:8px;transition:color .2s}
-.q-skip:hover{color:var(--t2)}
-
-/* ── MAIN SCREEN (memory chat + archive) ── */
-.main-screen{padding:0}
-.main-header{
-  padding:16px 20px;background:var(--s);border-bottom:1px solid var(--b);
-  display:flex;align-items:center;gap:12px;flex-shrink:0;
-}
-.main-avatar{width:40px;height:40px;border-radius:50%;background:var(--warm-g);display:grid;place-items:center;font-size:1.2rem;flex-shrink:0;border:1px solid var(--bw)}
-.main-info{flex:1}
-.main-name{font-family:var(--fd);font-size:1rem;font-weight:600;color:var(--t)}
-.main-sub{font-size:.68rem;color:var(--t3)}
-.main-actions{display:flex;gap:6px}
-.main-btn{padding:6px 10px;background:var(--s2);border:1px solid var(--b);border-radius:var(--rx);font-size:.7rem;font-weight:600;color:var(--t2);cursor:pointer;font-family:var(--fb);transition:all .15s}
-.main-btn:hover{background:var(--s3);color:var(--t)}
-.main-btn.active{background:var(--warm-g);border-color:var(--bw);color:var(--warm)}
-
-/* ── Tabs ── */
-.tabs{display:flex;border-bottom:1px solid var(--b);flex-shrink:0}
-.tab{flex:1;padding:10px;text-align:center;font-size:.75rem;font-weight:600;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
-.tab.active{color:var(--warm);border-color:var(--warm)}
-
-.tab-content{flex:1;overflow-y:auto;display:none}
-.tab-content.active{display:flex;flex-direction:column}
-
-/* ── Chat tab ── */
-.mem-chat{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px}
-.mem-msg{max-width:85%;padding:12px 16px;border-radius:var(--rs);font-size:.88rem;line-height:1.6;animation:gentle .3s ease both}
-.mem-msg-them{background:var(--s2);border:1px solid var(--b);align-self:flex-start;border-bottom-left-radius:4px}
-.mem-msg-them .sender{font-size:.62rem;font-weight:700;color:var(--warm);margin-bottom:4px;letter-spacing:.5px}
-.mem-msg-you{background:var(--warm-g);border:1px solid var(--bw);align-self:flex-end;border-bottom-right-radius:4px;color:var(--t)}
-.mem-msg-note{background:var(--sage-g);border:1px solid rgba(138,181,160,.12);align-self:center;color:var(--sage);font-size:.78rem;text-align:center;border-radius:50px;padding:8px 20px;font-style:italic}
-
-.mem-input{padding:12px 16px;border-top:1px solid var(--b);display:flex;gap:8px;flex-shrink:0}
-.mem-input input{flex:1;padding:12px 16px;background:var(--s2);border:1px solid var(--b);border-radius:50px;color:var(--t);font-family:var(--fb);font-size:.88rem;outline:none}
-.mem-input input:focus{border-color:var(--warm-d)}
-.mem-input input::placeholder{color:var(--t3)}
-.mem-send{width:42px;height:42px;border-radius:50%;background:var(--warm);border:none;display:grid;place-items:center;cursor:pointer;font-size:1rem;color:var(--bg);transition:all .2s;flex-shrink:0}
-.mem-send:hover{background:var(--warm-b)}
-
-/* ── Archive tab ── */
-.archive{padding:16px;overflow-y:auto}
-.archive-card{background:var(--s2);border:1px solid var(--b);border-radius:var(--rs);padding:16px;margin-bottom:10px}
-.archive-card .ac-cat{font-size:.6rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--warm-d);margin-bottom:6px}
-.archive-card .ac-q{font-family:var(--fd);font-size:.88rem;font-style:italic;color:var(--t2);margin-bottom:6px}
-.archive-card .ac-a{font-size:.88rem;color:var(--t);line-height:1.6}
-
-/* ── Export ── */
-.export-bar{padding:12px 16px;border-top:1px solid var(--b);text-align:center;flex-shrink:0}
-
-/* ── 432 Hz ── */
-.hz{position:fixed;bottom:70px;right:16px;z-index:20;padding:6px 12px;background:rgba(10,10,14,.8);backdrop-filter:blur(8px);border:1px solid rgba(138,181,160,.2);border-radius:50px;font-size:.68rem;font-weight:600;color:var(--sage);display:none;align-items:center;gap:4px;cursor:pointer}
-.hz.on{display:flex}
-.hz .hd{width:6px;height:6px;border-radius:50%;background:var(--sage);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-
-/* ── Support ── */
-.support{text-align:center;padding:20px 16px}
-.support p{font-size:.72rem;color:var(--t3);margin-bottom:10px}
-.support a{display:inline-flex;align-items:center;gap:6px;padding:8px 20px;background:linear-gradient(135deg,#FF7170,#D44FA0);color:#fff;text-decoration:none;border-radius:50px;font-weight:700;font-size:.78rem;transition:transform .2s}
-.support a:hover{transform:translateY(-2px)}
-
-.legal{text-align:center;padding:16px;font-size:.62rem;color:var(--t3);line-height:1.6}
-.legal a{color:var(--warm-d);text-decoration:none}
+footer{text-align:center;padding:28px 0 0;font-size:.7rem;color:rgba(234,228,216,0.2);border-top:1px solid var(--border-soft);margin-top:32px}
+footer a{color:var(--warm);text-decoration:none}
 </style>
-<!-- AW-SEO-INJECTED -->
-<meta name="keywords" content="digital memory, family archive, memory companion, legacy app, remember loved ones">
-<link rel="canonical" href="https://AcKccreate.github.io/anchor-remembers/">
-<!-- Open Graph -->
-<meta property="og:type"        content="website">
-<meta property="og:title"       content="Anchor Remembers — Digital Memory Archive for Loved Ones">
-<meta property="og:description" content="Capture voices, stories, and wisdom before they're gone. A gentle AI memory companion by AnchorWithin.">
-<meta property="og:url"         content="https://AcKccreate.github.io/anchor-remembers/">
-<meta property="og:image"       content="https://AcKccreate.github.io/og-image.png">
-<meta property="og:site_name"   content="AnchorWithin">
-<!-- Twitter Card -->
-<meta name="twitter:card"        content="summary_large_image">
-<meta name="twitter:title"       content="Anchor Remembers — Digital Memory Archive for Loved Ones">
-<meta name="twitter:description" content="Capture voices, stories, and wisdom before they're gone. A gentle AI memory companion by AnchorWithin.">
-<meta name="twitter:image"       content="https://AcKccreate.github.io/og-image.png">
-<meta name="twitter:site"        content="@AnchorWithin">
-<!-- Structured Data -->
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebApplication","name":"Anchor Remembers — Digital Memory Archive for Loved Ones","description":"Capture voices, stories, and wisdom before they're gone. A gentle AI memory companion by AnchorWithin.","url":"https://AcKccreate.github.io/anchor-remembers/","author":{"@type":"Organization","name":"AnchorWithin"},"offers":{"@type":"Offer","price":"$4.99 Pro"}}
-</script>
 </head>
 <body>
+<div class="app">
+  <header>
+    <a href="#" class="logo"><div class="logo-icon">⚓</div>AnchorWithin</a>
+    <div class="nav-btns">
+      <button class="nav-btn active" id="nav-welcome" onclick="goScreen('welcome')">Home</button>
+      <button class="nav-btn" id="nav-prompts" onclick="goScreen('prompts')">Prompts</button>
+      <button class="nav-btn" id="nav-memories" onclick="goScreen('memories')">Archive</button>
+    </div>
+  </header>
 
-<!-- ═══════════════════════════════════════
-     SCREEN 1: PERMISSION
-     ═══════════════════════════════════════ -->
-<div class="screen perm-screen active" id="screenPerm">
-  <div class="perm-icon">&#9875;</div>
-  <h1 class="perm-title">The Anchor <em>Remembers</em></h1>
-  <p class="perm-text">
-    A gentle space to capture the voice, stories, wisdom, and spirit of someone you love &mdash; so that when they can&rsquo;t be here, a piece of them still is.
-  </p>
-  <div class="perm-promise">
-    &ldquo;This is not a replacement for a person. It is a respectful archive of real memories, created only with full permission. Every memory stays private on your device.&rdquo;
+  <!-- WELCOME SCREEN -->
+  <div class="screen active" id="screen-welcome">
+    <div class="welcome">
+      <div class="welcome-ornament">📖</div>
+      <h1>The Stories That<br><em>Hold Us Together</em></h1>
+      <p>Guided questions that gently draw out the memories, wisdom, and love of the people who shaped you. Every answer becomes a treasure.</p>
+      <div class="welcome-promise">"Every life is a story worth telling. Every memory preserved is a gift to those who come after."</div>
+      <div class="welcome-btns">
+        <button class="btn btn-warm" onclick="startSetup()">Begin a New Memory Book</button>
+        <button class="btn btn-outline" onclick="continueSession()">Continue Existing Book</button>
+      </div>
+    </div>
+
+    <div id="setupCard" style="display:none">
+      <div class="whose-card">
+        <h3>Whose memories are we capturing?</h3>
+        <div class="whose-options">
+          <div class="whose-opt" onclick="selectWhose('self')">
+            <div class="whose-icon">🧑</div>
+            <div class="whose-name">My Own</div>
+            <div class="whose-desc">Your life story</div>
+          </div>
+          <div class="whose-opt" onclick="selectWhose('parent')">
+            <div class="whose-icon">👴</div>
+            <div class="whose-name">Parent / Grandparent</div>
+            <div class="whose-desc">For them or about them</div>
+          </div>
+          <div class="whose-opt" onclick="selectWhose('child')">
+            <div class="whose-icon">🧒</div>
+            <div class="whose-name">Child</div>
+            <div class="whose-desc">Growing up stories</div>
+          </div>
+          <div class="whose-opt" onclick="selectWhose('partner')">
+            <div class="whose-icon">💑</div>
+            <div class="whose-name">Partner / Spouse</div>
+            <div class="whose-desc">Your story together</div>
+          </div>
+        </div>
+        <div class="input-field-wrap" id="nameInput" style="display:none;margin-top:14px">
+          <input type="text" class="text-input" id="subjectName" placeholder="Their name...">
+          <button class="btn btn-warm" style="margin-top:10px;width:100%" onclick="createBook()">Create Memory Book →</button>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="perm-btns">
-    <button class="btn btn-warm btn-wide" onclick="showSetup()">Begin with Permission</button>
-    <button class="btn btn-ghost btn-wide" onclick="loadExisting()">I Have an Existing Archive</button>
+
+  <!-- PROMPTS SCREEN -->
+  <div class="screen" id="screen-prompts">
+    <div class="prompts-header">
+      <h2 id="promptsTitle">Memory Prompts</h2>
+      <div class="prompt-progress" id="promptProgress">0 of 25 answered</div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-val" id="answeredCount">0</div>
+        <div class="stat-label">Answered</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="wordCount">0</div>
+        <div class="stat-label">Words Written</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="photoCount">0</div>
+        <div class="stat-label">Photos Added</div>
+      </div>
+    </div>
+
+    <div class="cat-tabs" id="catTabs"></div>
+    <div id="promptsList"></div>
+    <div class="btn-row" style="margin-top:16px">
+      <button class="btn btn-warm" onclick="goScreen('memories')">View Archive →</button>
+      <button class="btn btn-sage" onclick="exportText()">📄 Export Text</button>
+      <button class="btn btn-outline" onclick="exportPDF()">🖨 Print / PDF</button>
+    </div>
+    <div class="share-card">
+      <h4>📤 Family Sharing Link</h4>
+      <p style="font-size:.78rem;color:var(--cream-dim)">Copy your memory archive as a shareable link (encoded in the URL).</p>
+      <div class="share-link-row">
+        <input type="text" class="share-link-input" id="shareLink" readonly placeholder="Generate link...">
+        <button class="btn btn-sage btn-sm" onclick="generateShareLink()">Generate</button>
+        <button class="btn btn-outline btn-sm" id="copyLinkBtn" onclick="copyShareLink()">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEMORIES ARCHIVE -->
+  <div class="screen" id="screen-memories">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <h2 style="font-family:'Lora',serif;font-size:1.3rem;font-weight:400" id="archiveTitle">Memory Archive</h2>
+      <button class="btn btn-outline btn-sm" onclick="goScreen('prompts')">+ Add More</button>
+    </div>
+    <div id="memoriesGrid"></div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     SCREEN 2: SETUP
-     ═══════════════════════════════════════ -->
-<div class="screen setup-screen" id="screenSetup">
-  <div class="setup-header">
-    <h2>Who Are We Remembering?</h2>
-    <p>Just the basics &mdash; we&rsquo;ll ask deeper questions next</p>
-  </div>
-  <div class="setup-body">
-    <div class="setup-field">
-      <label>Their Name</label>
-      <input type="text" id="personName" placeholder="First name or what you call them">
-    </div>
-    <div class="setup-field">
-      <label>Your Relationship</label>
-      <input type="text" id="personRelation" placeholder="e.g. My grandmother, My best friend, My father">
-    </div>
-    <div class="setup-field">
-      <label>One Word That Describes Them</label>
-      <input type="text" id="personWord" placeholder="e.g. Gentle, Brave, Joyful, Wise">
-    </div>
-    <div class="setup-field">
-      <label>A Short Description (optional)</label>
-      <div class="hint">Who are they to you? What makes them special?</div>
-      <textarea id="personDesc" placeholder="She was the kind of person who made everyone feel like they belonged..."></textarea>
-    </div>
-  </div>
-  <div class="setup-footer">
-    <button class="btn btn-warm btn-wide" onclick="startQuestions()">Continue to Memory Questions</button>
-  </div>
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lightboxImg" src="" alt="">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
 </div>
 
-<!-- ═══════════════════════════════════════
-     SCREEN 3: GUIDED QUESTIONS
-     ═══════════════════════════════════════ -->
-<div class="screen q-screen" id="screenQuestions">
-  <div class="q-progress">
-    <div class="q-bar"><div class="q-bar-fill" id="qBar" style="width:0%"></div></div>
-    <div class="q-count" id="qCount">Question 1 of 25</div>
-  </div>
-  <div class="q-body">
-    <div class="q-category" id="qCat">THEIR STORY</div>
-    <div class="q-text" id="qText">Loading question...</div>
-    <div class="q-input">
-      <textarea id="qAnswer" placeholder="Take your time. There are no wrong answers."></textarea>
-    </div>
-    <div class="q-skip" onclick="skipQuestion()">Skip this one &rarr;</div>
-  </div>
-  <div class="q-footer">
-    <button class="btn btn-ghost" onclick="prevQuestion()">&#8592; Back</button>
-    <button class="btn btn-warm" onclick="nextQuestion()">Next &#8594;</button>
-  </div>
-</div>
+<div class="toast" id="toast"></div>
 
-
-<!-- Memory Gate Overlay -->
-<div id="memGate" style="display:none;position:fixed;inset:0;z-index:100;flex-direction:column;align-items:center;justify-content:center;background:rgba(10,12,18,.92);backdrop-filter:blur(12px);text-align:center;padding:32px">
-  <div style="font-size:2rem;margin-bottom:12px">&#128274;</div>
-  <div style="font-weight:700;font-size:1.1rem;color:#E6E4DF;margin-bottom:8px">5 Free Memories Saved</div>
-  <div style="font-size:.85rem;color:#9A978F;margin-bottom:24px;max-width:280px;line-height:1.6">You've captured 5 memories for free.<br>Unlock Premium to save all 25 guided questions and preserve their full story.</div>
-  <button onclick="unlockPro()" style="display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:#C4956A;border:none;border-radius:10px;font-weight:700;font-size:.9rem;color:#fff;cursor:pointer;margin-bottom:12px">&#127775; Unlock Premium &mdash; $4.99</button>
-  <div style="font-size:.72rem;color:#585650;margin-top:4px">One-time payment &middot; Your memories stay private on your device</div>
-</div>
-
-<!-- Memory Gate Overlay -->
-<div id="memGate" style="display:none;position:fixed;inset:0;z-index:100;flex-direction:column;align-items:center;justify-content:center;background:rgba(10,12,18,.92);backdrop-filter:blur(12px);text-align:center;padding:32px">
-  <div style="font-size:2rem;margin-bottom:12px">&#128274;</div>
-  <div style="font-weight:700;font-size:1.1rem;color:#EDE7DA;margin-bottom:8px">5 Free Memories Saved</div>
-  <div style="font-size:.85rem;color:#9A978F;margin-bottom:24px;max-width:280px;line-height:1.6">You've captured 5 memories for free.<br>Unlock Premium to preserve their full story &mdash; all 25 guided questions.</div>
-  <button onclick="unlockPro()" style="display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:#C4956A;border:none;border-radius:10px;font-weight:700;font-size:.9rem;color:#fff;cursor:pointer;margin-bottom:12px">&#127775; Unlock Premium &mdash; $4.99</button>
-  <div style="font-size:.72rem;color:#585650;margin-top:4px">One-time &middot; Your memories stay private on your device</div>
-</div>
-<!-- ═══════════════════════════════════════
-     SCREEN 4: MAIN (CHAT + ARCHIVE)
-     ═══════════════════════════════════════ -->
-<div class="screen main-screen" id="screenMain">
-  <div class="main-header">
-    <div class="main-avatar" id="mainAvatar">&#9875;</div>
-    <div class="main-info">
-      <div class="main-name" id="mainName">Their Name</div>
-      <div class="main-sub">Memory Archive &middot; AnchorWithin</div>
-    </div>
-    <div class="main-actions">
-      <button class="main-btn" id="btn432m" onclick="toggle432()">&#127925; 432</button>
-    </div>
-  </div>
-
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('chat',this)">&#128172; Talk</div>
-    <div class="tab" onclick="switchTab('archive',this)">&#128218; Archive</div>
-    <div class="tab" onclick="switchTab('more',this)">&#9881; More</div>
-  </div>
-
-  <!-- Chat tab -->
-  <div class="tab-content active" id="tabChat">
-    <div class="mem-chat" id="memChat"></div>
-    <div class="mem-input">
-      <input type="text" id="memInput" placeholder="Talk to their memory..." autocomplete="off">
-      <button class="mem-send" onclick="sendMemChat()">&#10148;</button>
-    </div>
-  </div>
-
-  <!-- Archive tab -->
-  <div class="tab-content" id="tabArchive">
-    <div class="archive" id="archiveList"></div>
-  </div>
-
-  <!-- More tab -->
-  <div class="tab-content" id="tabMore" style="padding:16px;overflow-y:auto">
-    <div style="margin-bottom:16px">
-      <button class="btn btn-ghost btn-wide" onclick="addMoreMemories()">&#10133; Add More Memories</button>
-    </div>
-    <div style="margin-bottom:16px">
-      <button class="btn btn-ghost btn-wide" onclick="exportArchive()">&#128190; Export Archive (JSON)</button>
-    </div>
-    <div style="margin-bottom:16px">
-      <button class="btn btn-ghost btn-wide" onclick="exportReadable()">&#128196; Export as Readable Text</button>
-    </div>
-    <div style="margin-bottom:16px">
-      <button class="btn btn-warm btn-wide" onclick="unlockPro()">&#127775; Unlock Premium &mdash; $4.99</button>
-    </div>
-    <div class="support">
-      <p>The Anchor Remembers is a free tool by AnchorWithin.<br>If it brought you comfort, you can support the mission.</p>
-      <a href="https://ko-fi.com/anchorwithin" target="_blank" rel="noopener">&#9749; Support AnchorWithin</a>
-    </div>
-    <div class="legal">
-      &copy; 2026 AnchorWithin LLC<br>All memories stay on your device. We never see or store your data.<br>
-      <a href="https://youtube.com/@AnchorWithin">YouTube</a> &middot; <a href="https://ko-fi.com/anchorwithin">Ko-fi</a>
-    </div>
-  </div>
-</div>
-
-<div class="hz" id="hzBadge" onclick="toggle432()"><span class="hd"></span>432 Hz</div>
+<footer>&copy; 2026 AnchorWithin LLC · All memories stored locally · Never shared without your consent<br><a href="https://youtube.com/@AnchorWithin">YouTube</a> &middot; <a href="https://ackccreate.github.io/anchorwithin-store/">Store</a></footer>
 
 <script>
-/* ═══════════════════════════════════════
-   QUESTION DATABASE
-   ═══════════════════════════════════════ */
-const QUESTIONS=[
-  {cat:'Their Story',q:"What is the first memory you have of them?"},
-  {cat:'Their Story',q:"Where did they grow up? What was their childhood like?"},
-  {cat:'Their Story',q:"What did they do for a living, and how did they feel about it?"},
-  {cat:'Their Story',q:"What was the happiest time of their life?"},
-  {cat:'Their Voice',q:"What did they sound like when they laughed?"},
-  {cat:'Their Voice',q:"What phrase or saying did they repeat most often?"},
-  {cat:'Their Voice',q:"What did they call you? Did they have a special nickname for you?"},
-  {cat:'Their Voice',q:"How did they greet you when you walked through the door?"},
-  {cat:'Their Heart',q:"What made them cry? What moved them deeply?"},
-  {cat:'Their Heart',q:"Who did they love the most in this world?"},
-  {cat:'Their Heart',q:"What did they worry about?"},
-  {cat:'Their Heart',q:"How did they show love? What was their love language?"},
-  {cat:'Their Wisdom',q:"What was the best advice they ever gave you?"},
-  {cat:'Their Wisdom',q:"What life lesson did they teach you without even trying?"},
-  {cat:'Their Wisdom',q:"What did they believe in most strongly?"},
-  {cat:'Their Wisdom',q:"If they could give you one more piece of advice right now, what would it be?"},
-  {cat:'Their Joy',q:"What made them laugh the hardest?"},
-  {cat:'Their Joy',q:"What was their favorite food, drink, or comfort meal?"},
-  {cat:'Their Joy',q:"What song, movie, or book reminds you most of them?"},
-  {cat:'Their Joy',q:"What hobby or activity lit them up inside?"},
-  {cat:'Their Spirit',q:"What was their superpower \u2014 the thing they were best at?"},
-  {cat:'Their Spirit',q:"How did they handle hard times? What kept them going?"},
-  {cat:'Their Spirit',q:"What would they want you to know right now?"},
-  {cat:'Their Spirit',q:"If you could have one more conversation with them, what would you say?"},
-  {cat:'Their Spirit',q:"What about them do you hope to carry forward in your own life?"},
+const PROMPTS = [
+  // Early Life
+  {id:1,cat:'Early Life',q:"Where were you born, and what do you know about the day you arrived in the world?",followup:"What did your parents tell you about that time in their lives?"},
+  {id:2,cat:'Early Life',q:"Describe the home you grew up in — the sights, smells, sounds that take you right back.",followup:"If you close your eyes, what's the first room you see?"},
+  {id:3,cat:'Early Life',q:"What was your neighborhood or town like? Who were the characters in your young world?",followup:"Is there a place from childhood you wish you could revisit?"},
+  {id:4,cat:'Early Life',q:"What games did you play as a child? What toys or books meant the most to you?",followup:"Who did you play with most, and where are they now?"},
+  {id:5,cat:'Early Life',q:"What is your earliest memory? Walk through it as slowly as you can.",followup:"How old do you think you were? What feeling does it leave you with?"},
+  // Family
+  {id:6,cat:'Family',q:"Tell me about your mother — who was she beyond being your parent?",followup:"What's one thing she said that you still hear in your head?"},
+  {id:7,cat:'Family',q:"Tell me about your father — what shaped him, and how did that shape you?",followup:"What do you wish you'd asked him while you had the chance?"},
+  {id:8,cat:'Family',q:"Describe a grandparent or elder who left a mark on your spirit.",followup:"What wisdom did they carry that the world needs now?"},
+  {id:9,cat:'Family',q:"What were holiday gatherings like in your family? What traditions do you still carry?",followup:"What tradition do you hope will outlive you?"},
+  {id:10,cat:'Family',q:"Who in your family tree are you most curious about — and why?",followup:"If you could have one conversation with an ancestor, what would you ask?"},
+  // Love & Friendship
+  {id:11,cat:'Love & Connection',q:"Tell me about your closest friendship — the one that changed you.",followup:"What made that bond different from others?"},
+  {id:12,cat:'Love & Connection',q:"Describe falling in love for the first time — the butterflies, the nervousness.",followup:"What did that teach you about yourself?"},
+  {id:13,cat:'Love & Connection',q:"What does love look like in action, in your experience?",followup:"Who showed you that definition first?"},
+  // Turning Points
+  {id:14,cat:'Turning Points',q:"Name a moment when your life split into 'before' and 'after'. What happened?",followup:"Who was by your side — or who wasn't?"},
+  {id:15,cat:'Turning Points',q:"What's the hardest thing you've ever been through, and what did it teach you?",followup:"Looking back, can you see any unexpected gifts in it?"},
+  {id:16,cat:'Turning Points',q:"Describe a decision you made that changed the course of your life.",followup:"If you could go back, would you make the same choice?"},
+  {id:17,cat:'Turning Points',q:"Who believed in you when you didn't believe in yourself?",followup:"Did you ever tell them what that meant?"},
+  // Work & Purpose
+  {id:18,cat:'Work & Purpose',q:"What work are you most proud of — paid or unpaid, recognized or not?",followup:"What did doing it reveal about who you are?"},
+  {id:19,cat:'Work & Purpose',q:"What were you called to do, deep down? Did you get to do it?",followup:"What got in the way, or what made it possible?"},
+  // Wisdom
+  {id:20,cat:'Wisdom',q:"What advice would you give your younger self — the one standing at the beginning?",followup:"Why is that the thing you'd choose to say?"},
+  {id:21,cat:'Wisdom',q:"What do you know now about happiness that took you decades to learn?",followup:"Who did you have to become to know it?"},
+  {id:22,cat:'Wisdom',q:"What belief or value guides you that you'd want passed down to every generation after you?",followup:"Where did that belief come from?"},
+  // Legacy
+  {id:23,cat:'Legacy',q:"What do you want people to remember about you — not your accomplishments, but YOU?",followup:"Is that the impression you've been leaving?"},
+  {id:24,cat:'Legacy',q:"What story about your life would you most want your great-grandchildren to know?",followup:"What would you want them to feel when they hear it?"},
+  {id:25,cat:'Legacy',q:"If you could leave one message in a time capsule to be opened in 50 years, what would you write?",followup:"Who is it really for?"},
 ];
 
-/* ═══════════════════════════════════════
-   STATE
-   ═══════════════════════════════════════ */
-let person={name:'',relation:'',word:'',desc:''};
-let answers={}; // qIndex -> answer text
-let qIndex=0;
-let isPro=false;
-let isPro=false;
+const CATEGORIES = [...new Set(PROMPTS.map(p=>p.cat))];
 
-function save(){
-  try{
-    localStorage.setItem('aw_anchor_remembers',JSON.stringify({person,answers,version:1}));
-  }catch(e){}
+let state = {
+  subject:'',
+  subjectType:'self',
+  answers:{},
+  photos:{},
+  currentCat:'All',
+  expanded:null,
+};
+
+function loadState(){
+  try{const raw=localStorage.getItem('aw_remembers');if(raw)state=JSON.parse(raw);}catch(e){}
+}
+function saveState(){localStorage.setItem('aw_remembers',JSON.stringify(state));}
+
+function startSetup(){document.getElementById('setupCard').style.display='block';}
+function selectWhose(type){
+  state.subjectType=type;
+  document.querySelectorAll('.whose-opt').forEach(el=>el.classList.toggle('selected',el.getAttribute('onclick').includes("'"+type+"'")));
+  document.getElementById('nameInput').style.display='block';
+  const placeholder={self:'Your name',parent:'Their name',child:'Their name',partner:'Their name'};
+  document.getElementById('subjectName').placeholder=placeholder[type]||'Name...';
+  document.getElementById('subjectName').focus();
+}
+function createBook(){
+  const name=document.getElementById('subjectName').value.trim();
+  if(!name){showToast('Please enter a name');return;}
+  state.subject=name;
+  saveState();
+  goScreen('prompts');
+}
+function continueSession(){
+  loadState();
+  if(!state.subject){startSetup();}
+  else goScreen('prompts');
 }
 
-function load(){
-  try{
-    const d=JSON.parse(localStorage.getItem('aw_anchor_remembers'));
-    if(d&&d.person&&d.person.name){person=d.person;answers=d.answers||{};return true;}
-  }catch(e){}
-  return false;
-}
-
-/* ═══════════════════════════════════════
-   NAVIGATION
-   ═══════════════════════════════════════ */
-function showScreen(id){
+function goScreen(name){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  document.getElementById('screen-'+name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const navMap={welcome:'nav-welcome',prompts:'nav-prompts',memories:'nav-memories'};
+  if(navMap[name]) document.getElementById(navMap[name]).classList.add('active');
+  if(name==='prompts') buildPrompts();
+  if(name==='memories') buildMemories();
 }
 
-function showSetup(){showScreen('screenSetup')}
-
-function loadExisting(){
-  if(load()){
-    goToMain();
-  } else {
-    alert('No existing archive found on this device. Let\u2019s start fresh.');
-  }
+function buildCatTabs(){
+  const cats=['All',...CATEGORIES];
+  document.getElementById('catTabs').innerHTML=cats.map(c=>`
+    <div class="cat-tab${c===state.currentCat?' active':''}" onclick="filterCat('${c}')">${c}</div>`).join('');
 }
 
-function startQuestions(){
-  person.name=document.getElementById('personName').value.trim()||'Them';
-  person.relation=document.getElementById('personRelation').value.trim();
-  person.word=document.getElementById('personWord').value.trim();
-  person.desc=document.getElementById('personDesc').value.trim();
-  if(!person.name){document.getElementById('personName').focus();return;}
-  qIndex=0;
-  renderQuestion();
-  showScreen('screenQuestions');
+function filterCat(cat){
+  state.currentCat=cat;
+  buildCatTabs();
+  buildPromptsList();
 }
 
-function renderQuestion(){
-  const q=QUESTIONS[qIndex];
-  const personalized=q.q.replace(/they|them|their/gi,m=>{
-    if(m==='they'||m==='They') return person.name;
-    if(m==='them'||m==='Them') return person.name;
-    if(m==='their'||m==='Their') return person.name+"'s";
-    return m;
-  });
-  document.getElementById('qCat').textContent=q.cat.toUpperCase();
-  document.getElementById('qText').textContent=personalized;
-  document.getElementById('qAnswer').value=answers[qIndex]||'';
-  document.getElementById('qBar').style.width=((qIndex+1)/QUESTIONS.length*100)+'%';
-  document.getElementById('qCount').textContent=`Question ${qIndex+1} of ${QUESTIONS.length}`;
-  document.getElementById('qAnswer').focus();
+function buildPrompts(){
+  const name=state.subject||'Your Subject';
+  document.getElementById('promptsTitle').textContent=name+"'s Memory Book";
+  document.getElementById('archiveTitle').textContent=name+"'s Archive";
+  buildCatTabs();
+  buildPromptsList();
+  updateStats();
 }
 
-function saveCurrentAnswer(){
-  const val=document.getElementById('qAnswer').value.trim();
-  if(val) answers[qIndex]=val;
+function buildPromptsList(){
+  const filtered=state.currentCat==='All'?PROMPTS:PROMPTS.filter(p=>p.cat===state.currentCat);
+  document.getElementById('promptsList').innerHTML=filtered.map(p=>{
+    const ans=state.answers[p.id]||'';
+    const answered=ans.trim().length>0;
+    const expanded=state.expanded===p.id;
+    const photos=state.photos[p.id]||[];
+    return `<div class="prompt-card${answered?' answered':''}${expanded?' expanded':''}" id="pc_${p.id}">
+      <div class="prompt-header" onclick="togglePrompt(${p.id})">
+        <div class="prompt-num">${p.id < 10?'0'+p.id:p.id}</div>
+        <div class="prompt-q">${p.q}</div>
+        <div class="prompt-status">${answered?'✅':'○'}</div>
+      </div>
+      <div class="prompt-body">
+        <textarea class="prompt-textarea" id="ta_${p.id}" placeholder="Begin writing here... there are no wrong answers." rows="5" oninput="saveAnswer(${p.id})">${ans}</textarea>
+        ${answered?`<div class="followup-box"><div class="followup-label">✨ Follow-up prompt</div><div class="followup-q">${p.followup}</div></div>`:''}
+        <div class="prompt-tools">
+          <label class="btn btn-outline btn-sm" style="cursor:pointer">
+            📷 Add Photo
+            <input type="file" accept="image/*" multiple style="display:none" onchange="addPhotos(${p.id},this)">
+          </label>
+          ${answered?`<button class="btn btn-sage btn-sm" onclick="event.stopPropagation();clearAnswer(${p.id})">Clear</button>`:''}
+        </div>
+        ${photos.length>0?`<div class="photo-thumb-row">${photos.map((ph,i)=>`<img src="${ph}" class="photo-thumb" onclick="openLightbox('${ph}')" alt="Memory photo">`).join('')}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  updateProgress();
 }
 
-function nextQuestion(){
-  saveCurrentAnswer();
-  const _saved=Object.keys(answers).filter(k=>answers[k]).length;
-  if(!isPro && _saved>=5){
-    document.getElementById('memGate').style.display='flex';
-    return;
-  }
-  if(qIndex<QUESTIONS.length-1){qIndex++;renderQuestion();}
-  else{save();goToMain();}
-}
-
-function prevQuestion(){
-  saveCurrentAnswer();
-  if(qIndex>0){qIndex--;renderQuestion();}
-}
-
-function skipQuestion(){
-  if(qIndex<QUESTIONS.length-1){qIndex++;renderQuestion();}
-  else{save();goToMain();}
-}
-
-function addMoreMemories(){
-  qIndex=0;renderQuestion();showScreen('screenQuestions');
-}
-
-/* ═══════════════════════════════════════
-   MAIN SCREEN
-   ═══════════════════════════════════════ */
-function goToMain(){
-  save();
-  document.getElementById('mainName').textContent=person.name;
-  renderArchive();
-  showScreen('screenMain');
-
-  // Welcome message
-  const chat=document.getElementById('memChat');
-  chat.innerHTML='';
-  addMemNote(`This is ${person.name}'s memory space. Everything here comes from real answers and real love.`);
-
-  const answeredQs=Object.keys(answers).map(Number).filter(i=>answers[i]);
-  if(answeredQs.length>0){
-    const randomIdx=answeredQs[Math.floor(Math.random()*answeredQs.length)];
-    const q=QUESTIONS[randomIdx];
+function togglePrompt(id){
+  state.expanded=state.expanded===id?null:id;
+  buildPromptsList();
+  if(state.expanded){
     setTimeout(()=>{
-      addMemMsg(`You once told me that when asked "${q.q.toLowerCase()}", the answer was:\n\n"${answers[randomIdx]}"`,person.name);
-    },1000);
-  } else {
-    setTimeout(()=>{addMemMsg("No memories recorded yet. Go to the Archive tab and add some memories to get started.",person.name)},800);
+      const ta=document.getElementById('ta_'+id);
+      if(ta) ta.focus();
+    },50);
   }
 }
 
-function addMemMsg(text,sender){
-  const chat=document.getElementById('memChat');
-  const div=document.createElement('div');
-  div.className='mem-msg mem-msg-them';
-  div.innerHTML=`<div class="sender">\u2693 ${sender}</div>${text.replace(/\n/g,'<br>')}`;
-  chat.appendChild(div);chat.scrollTop=chat.scrollHeight;
+function saveAnswer(id){
+  const val=document.getElementById('ta_'+id).value;
+  state.answers[id]=val;
+  saveState();
+  updateStats();
+  // Refresh followup visibility without full rebuild
+  const card=document.getElementById('pc_'+id);
+  if(card){
+    card.classList.toggle('answered',val.trim().length>0);
+  }
 }
 
-function addMemUser(text){
-  const chat=document.getElementById('memChat');
-  const div=document.createElement('div');
-  div.className='mem-msg mem-msg-you';
-  div.textContent=text;
-  chat.appendChild(div);chat.scrollTop=chat.scrollHeight;
+function clearAnswer(id){
+  delete state.answers[id];
+  delete state.photos[id];
+  saveState();
+  buildPromptsList();
+  updateStats();
 }
 
-function addMemNote(text){
-  const chat=document.getElementById('memChat');
-  const div=document.createElement('div');
-  div.className='mem-msg mem-msg-note';
-  div.textContent=text;
-  chat.appendChild(div);chat.scrollTop=chat.scrollHeight;
-}
-
-function sendMemChat(){
-  const input=document.getElementById('memInput');
-  const text=input.value.trim();if(!text)return;
-  addMemUser(text);input.value='';
-
-  const lower=text.toLowerCase();
-  const answeredQs=Object.keys(answers).map(Number).filter(i=>answers[i]);
-
-  setTimeout(()=>{
-    // Try to match user's question to a stored memory
-    let bestMatch=null,bestScore=0;
-    const inputWords=lower.split(/\s+/);
-
-    answeredQs.forEach(idx=>{
-      const q=QUESTIONS[idx].q.toLowerCase();
-      const a=answers[idx].toLowerCase();
-      let score=0;
-      inputWords.forEach(w=>{
-        if(w.length>3&&(q.includes(w)||a.includes(w))) score++;
-      });
-      if(score>bestScore){bestScore=score;bestMatch=idx;}
-    });
-
-    // Keywords for specific topics
-    const topicMap={
-      'advice':[12,13,15],
-      'wisdom':[12,13,14,15],
-      'laugh':[16,4],
-      'happy':[3,16,17,18,19],
-      'sad':[8,10],
-      'love':[9,11],
-      'food':[17],
-      'music':[18],'song':[18],
-      'hobby':[19],
-      'strong':[20,21],
-      'child':[1],
-      'work':[2],'job':[2],
-      'say':[5,6,7],
-      'call':[6],
-      'miss':[22,23,24],
+function addPhotos(id,input){
+  const files=Array.from(input.files);
+  files.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      if(!state.photos[id]) state.photos[id]=[];
+      state.photos[id].push(e.target.result);
+      saveState();
+      buildPromptsList();
+      updateStats();
     };
-
-    // Check topic keywords
-    for(const[keyword,indices]of Object.entries(topicMap)){
-      if(lower.includes(keyword)){
-        const valid=indices.filter(i=>answers[i]);
-        if(valid.length>0){
-          const pick=valid[Math.floor(Math.random()*valid.length)];
-          addMemMsg(answers[pick],person.name);
-          return;
-        }
-      }
-    }
-
-    // Use best match if found
-    if(bestMatch!==null&&bestScore>=1){
-      addMemMsg(answers[bestMatch],person.name);
-      return;
-    }
-
-    // Fallback: share a random memory
-    if(answeredQs.length>0){
-      const randomIdx=answeredQs[Math.floor(Math.random()*answeredQs.length)];
-      const q=QUESTIONS[randomIdx];
-      addMemMsg(`I may not have the exact answer, but here's something:\n\nWhen asked "${q.q.toLowerCase()}":\n\n"${answers[randomIdx]}"`,person.name);
-    } else {
-      addMemNote("No memories recorded yet. Add memories through the guided questions to hear from "+person.name+".");
-    }
-  },800+Math.random()*600);
+    reader.readAsDataURL(file);
+  });
 }
 
-document.getElementById('memInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMemChat()});
+function updateStats(){
+  const answered=Object.values(state.answers).filter(v=>v&&v.trim().length>0).length;
+  const words=Object.values(state.answers).join(' ').split(/\s+/).filter(w=>w).length;
+  const photos=Object.values(state.photos).reduce((s,a)=>s+(a||[]).length,0);
+  document.getElementById('answeredCount').textContent=answered;
+  document.getElementById('wordCount').textContent=words.toLocaleString();
+  document.getElementById('photoCount').textContent=photos;
+  updateProgress();
+}
 
-/* ═══════════════════════════════════════
-   ARCHIVE TAB
-   ═══════════════════════════════════════ */
-function renderArchive(){
-  const list=document.getElementById('archiveList');
-  const answeredQs=Object.keys(answers).map(Number).filter(i=>answers[i]).sort((a,b)=>a-b);
-  if(answeredQs.length===0){
-    list.innerHTML='<p style="text-align:center;color:var(--t3);padding:40px 16px;font-style:italic">No memories recorded yet. Complete the guided questions to build the archive.</p>';
+function updateProgress(){
+  const answered=Object.values(state.answers).filter(v=>v&&v.trim().length>0).length;
+  document.getElementById('promptProgress').textContent=answered+' of '+PROMPTS.length+' answered';
+}
+
+function buildMemories(){
+  const answered=PROMPTS.filter(p=>state.answers[p.id]&&state.answers[p.id].trim().length>0);
+  if(answered.length===0){
+    document.getElementById('memoriesGrid').innerHTML=`<div class="memory-empty"><div class="memory-empty-icon">📭</div>No memories captured yet.<br><a href="#" onclick="goScreen('prompts')" style="color:var(--warm)">Start with a prompt →</a></div>`;
     return;
   }
-  list.innerHTML=answeredQs.map(i=>{
-    const q=QUESTIONS[i];
-    return `<div class="archive-card"><div class="ac-cat">${q.cat}</div><div class="ac-q">"${q.q}"</div><div class="ac-a">${answers[i]}</div></div>`;
+  document.getElementById('memoriesGrid').innerHTML=answered.map(p=>{
+    const photos=state.photos[p.id]||[];
+    const words=state.answers[p.id].split(/\s+/).length;
+    return `<div class="memory-card">
+      <div class="memory-meta">
+        <div class="memory-num">${p.cat} · #${p.id}</div>
+        <div class="memory-date">${words} words</div>
+      </div>
+      <div class="memory-q">${p.q}</div>
+      <div class="memory-text">${state.answers[p.id]}</div>
+      ${photos.length>0?`<div class="memory-photos">${photos.map(ph=>`<img src="${ph}" class="memory-photo" onclick="openLightbox('${ph}')" alt="">`).join('')}</div>`:''}
+    </div>`;
   }).join('');
 }
 
-function switchTab(name,el){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('tab'+name.charAt(0).toUpperCase()+name.slice(1)).classList.add('active');
-  if(name==='archive') renderArchive();
-}
-
-/* ═══════════════════════════════════════
-   EXPORT
-   ═══════════════════════════════════════ */
-function exportArchive(){
-  const data=JSON.stringify({person,answers,questions:QUESTIONS,exported:new Date().toISOString()},null,2);
-  const blob=new Blob([data],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;a.download=`anchor-remembers-${person.name.toLowerCase().replace(/\s/g,'-')}.json`;
-  a.click();URL.revokeObjectURL(url);
-}
-
-function exportReadable(){
-  const answeredQs=Object.keys(answers).map(Number).filter(i=>answers[i]).sort((a,b)=>a-b);
-  let text=`The Anchor Remembers: ${person.name}\n`;
-  text+=`Relationship: ${person.relation}\n`;
-  text+=`In one word: ${person.word}\n`;
-  if(person.desc) text+=`\n${person.desc}\n`;
-  text+=`\n${'='.repeat(50)}\n\n`;
-
-  let lastCat='';
-  answeredQs.forEach(i=>{
-    const q=QUESTIONS[i];
-    if(q.cat!==lastCat){text+=`\n--- ${q.cat.toUpperCase()} ---\n\n`;lastCat=q.cat;}
-    text+=`Q: ${q.q}\n`;
-    text+=`A: ${answers[i]}\n\n`;
+function exportText(){
+  const lines=[`MEMORY BOOK — ${state.subject||'Unnamed'}`,'Generated: '+new Date().toLocaleDateString(),'',`${'─'.repeat(50)}`,''];
+  PROMPTS.filter(p=>state.answers[p.id]).forEach(p=>{
+    lines.push(`PROMPT ${p.id} — ${p.cat}`);
+    lines.push(p.q);
+    lines.push('');
+    lines.push(state.answers[p.id]);
+    lines.push('');
+    lines.push('─'.repeat(50));
+    lines.push('');
   });
-
-  text+=`\n${'='.repeat(50)}\nCaptured with love using The Anchor Remembers by AnchorWithin\n`;
-
-  const blob=new Blob([text],{type:'text/plain'});
-  const url=URL.createObjectURL(blob);
+  const blob=new Blob([lines.join('\n')],{type:'text/plain'});
   const a=document.createElement('a');
-  a.href=url;a.download=`memories-of-${person.name.toLowerCase().replace(/\s/g,'-')}.txt`;
-  a.click();URL.revokeObjectURL(url);
+  a.href=URL.createObjectURL(blob);
+  a.download=(state.subject||'memories').replace(/\s+/g,'_')+'_memories.txt';
+  a.click();
+  showToast('Text file downloaded');
 }
 
-/* ═══════════════════════════════════════
-   432 Hz
-   ═══════════════════════════════════════ */
-let audioCtx=null,osc=null,gain=null,toneOn=false;
-function toggle432(){
-  if(!toneOn){
-    if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-    if(audioCtx.state==='suspended')audioCtx.resume();
-    osc=audioCtx.createOscillator();osc.type='sine';osc.frequency.value=432;
-    gain=audioCtx.createGain();gain.gain.value=0;
-    osc.connect(gain);gain.connect(audioCtx.destination);osc.start();
-    gain.gain.setTargetAtTime(.08,audioCtx.currentTime,.8);
-    toneOn=true;
-  } else {
-    gain.gain.setTargetAtTime(0,audioCtx.currentTime,.5);
-    setTimeout(()=>{try{osc.stop()}catch(e){}},800);
-    toneOn=false;
+function exportPDF(){
+  window.print();
+}
+
+function generateShareLink(){
+  const data={subject:state.subject,answers:state.answers};
+  const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+  const url=window.location.href.split('?')[0]+'?mem='+encoded;
+  document.getElementById('shareLink').value=url;
+  showToast('Share link generated!');
+}
+
+function copyShareLink(){
+  const val=document.getElementById('shareLink').value;
+  if(!val){generateShareLink();return;}
+  navigator.clipboard.writeText(val).then(()=>showToast('Link copied!')).catch(()=>{
+    document.getElementById('shareLink').select();
+    document.execCommand('copy');
+    showToast('Link copied!');
+  });
+}
+
+function loadFromURL(){
+  const params=new URLSearchParams(window.location.search);
+  const mem=params.get('mem');
+  if(mem){
+    try{
+      const data=JSON.parse(decodeURIComponent(escape(atob(mem))));
+      if(data.answers) state.answers=data.answers;
+      if(data.subject) state.subject=data.subject;
+      saveState();
+      goScreen('memories');
+    }catch(e){}
   }
-  document.getElementById('btn432m').classList.toggle('active',toneOn);
-  document.getElementById('hzBadge').classList.toggle('on',toneOn);
 }
 
-/* ═══════════════════════════════════════
-   INIT: Check for existing archive
-   ═══════════════════════════════════════ */
-if(load()){
-  // Has existing data — offer to resume
-  document.querySelector('.perm-btns').innerHTML=`
-    <button class="btn btn-warm btn-wide" onclick="goToMain()">Return to ${person.name}'s Memories</button>
-    <button class="btn btn-ghost btn-wide" onclick="showSetup()">Start New Archive</button>
-  `;
+function openLightbox(src){
+  document.getElementById('lightboxImg').src=src;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('open');}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
 }
 
-function unlockPro(){
-  window.location.href = 'https://buy.stripe.com/dRm4gAfdI22b6sffj467S0b';
-}
-(function(){
-  if(new URLSearchParams(location.search).get('paid')){try{localStorage.setItem('aw_remembers_pro','1')}catch(e){}isPro=true;}
-  try{if(localStorage.getItem('aw_remembers_pro')){isPro=true;}}catch(e){}
-})();
+loadState();
+loadFromURL();
 </script>
-
-
-<!-- Recommendation Section -->
-<div style="max-width:540px;margin:0 auto;padding:0 16px 8px">
-  <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);
-    border-left:3px solid #C4956A;border-radius:12px;padding:18px 16px;margin-bottom:16px">
-    <div style="font-size:.6rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
-      color:#C4956A;margin-bottom:8px">RECOMMENDED</div>
-    <div style="font-size:.92rem;font-weight:700;color:#E6E4DF;margin-bottom:6px">Turn These Memories Into a Real Book</div>
-    <div style="font-size:.8rem;color:#9A978F;line-height:1.55;margin-bottom:14px">The stories captured here deserve to exist beyond a screen. Print them as a keepsake book — a gift that lasts generations.</div>
-    <a href="https://chatbooks.com" target="_blank" rel="noopener sponsored" style="
-          display:flex;align-items:center;justify-content:space-between;gap:12px;
-          padding:12px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
-          border-radius:10px;text-decoration:none;color:#E6E4DF;font-size:.82rem;font-weight:500;
-          transition:background .2s;margin-bottom:8px">
-          <span>Chatbooks — Auto photo + story books</span>
-          <span style="font-size:.75rem;color:#C4956A;white-space:nowrap;font-weight:600">📚 From $10</span>
-        </a><a href="https://www.mixbook.com" target="_blank" rel="noopener sponsored" style="
-          display:flex;align-items:center;justify-content:space-between;gap:12px;
-          padding:12px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
-          border-radius:10px;text-decoration:none;color:#E6E4DF;font-size:.82rem;font-weight:500;
-          transition:background .2s;margin-bottom:8px">
-          <span>Mixbook — Custom memory books</span>
-          <span style="font-size:.75rem;color:#C4956A;white-space:nowrap;font-weight:600">🎁 Premium quality</span>
-        </a>
-  </div>
-</div>
-
-<!-- AnchorWithin Footer -->
-<style>
-.aw-footer{margin-top:48px;padding:20px 16px;border-top:1px solid rgba(255,255,255,.08);text-align:center;font-family:system-ui,sans-serif;font-size:13px;color:rgba(255,255,255,.35)}
-.aw-footer a{color:rgba(255,255,255,.5);text-decoration:none}.aw-footer a:hover{color:rgba(255,255,255,.8)}
-</style>
-<footer class="aw-footer">
-  Built by <a href="https://anchorwithin.com" target="_blank" rel="noopener">AnchorWithin</a>
-  &nbsp;·&nbsp;
-  <a href="https://anchorwithin.gumroad.com" target="_blank" rel="noopener">Browse All Tools</a>
-  &nbsp;·&nbsp;
-  <a href="https://anchorwithin.com/legal/terms" target="_blank" rel="noopener">Terms</a>
-  &nbsp;·&nbsp;
-  <a href="https://anchorwithin.com/legal/privacy" target="_blank" rel="noopener">Privacy</a>
-</footer>
-
 </body>
 </html>
